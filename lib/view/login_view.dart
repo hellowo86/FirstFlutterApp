@@ -1,9 +1,15 @@
+import 'package:firstflutter/data/join_or_login.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginBackground extends CustomPainter {
+  LoginBackground({@required this.isJoin});
+
+  final bool isJoin;
+
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()..color = Colors.blue;
+    Paint paint = Paint()..color = isJoin?Colors.red:Colors.blue;
     canvas.drawCircle(Offset(size.width*0.5, size.height*0.2), size.height*0.5, paint);
   }
 
@@ -30,7 +36,7 @@ class LoginView extends StatelessWidget {
         children: <Widget>[
           CustomPaint(
             size: size,
-            painter: LoginBackground(),
+            painter: LoginBackground(isJoin: Provider.of<JoinOrLogin>(context).isJoin),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -44,7 +50,12 @@ class LoginView extends StatelessWidget {
                 ],
               ),
               Container(height: size.height * 0.1,),
-              Text('계정이 없으신가요? 가입하기'),
+              InkWell(
+                onTap: () {
+                  Provider.of<JoinOrLogin>(context).toggle();
+                },
+                child: Text('계정이 없으신가요? 가입하기'),
+              ),
               Container(height: size.height * 0.05,)
             ],
           )
@@ -96,9 +107,8 @@ class LoginView extends StatelessWidget {
                 TextFormField(
                     obscureText: true,
                     controller: _passController,
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.vpn_key),
-                        labelText: '비밀번호'
+                    decoration: InputDecoration.collapsed(
+                        hintText: '비밀번호'
                     ),
                     validator: (String value) {
                       if(value.isEmpty) {
