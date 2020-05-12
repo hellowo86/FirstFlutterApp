@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "337249880577",
+    "firebase_url": "https://first-flutter-app-a3b93.firebaseio.com",
+    "project_id": "first-flutter-app-a3b93",
+    "storage_bucket": "first-flutter-app-a3b93.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337249880577:android:7d6c4eef7307d5d8134e00",
+        "android_client_info": {
+          "package_name": "com.hellowo.firstflutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337249880577-cph5dvq818elit9hqppnesoh2qbbib0k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hellowo.firstflutter",
+            "certificate_hash": "06825339c778a6aea9c594149f6245e674ec251e"
+          }
+        },
+        {
+          "client_id": "337249880577-pu20g729eoig4fnea1sf4u91bv1546l1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2jAnvFl-ey3Qxkvi52zV_pKQwkxmuDXs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337249880577-pu20g729eoig4fnea1sf4u91bv1546l1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
