@@ -1,24 +1,9 @@
-import 'package:firstflutter/data/join_or_login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-class LoginBackground extends CustomPainter {
-  LoginBackground({@required this.isJoin});
-
-  final bool isJoin;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()..color = isJoin?Colors.red:Colors.blue;
-    canvas.drawCircle(Offset(size.width*0.5, size.height*0.2), size.height*0.5, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
-  }
-
-}
+import 'splash.dart';
 
 class LoginView extends StatelessWidget {
   
@@ -50,11 +35,16 @@ class LoginView extends StatelessWidget {
                 ],
               ),
               Container(height: size.height * 0.1,),
-              InkWell(
-                onTap: () {
-                  Provider.of<JoinOrLogin>(context).toggle();
-                },
-                child: Text('계정이 없으신가요? 가입하기'),
+              Consumer<JoinOrLogin>(
+                builder: (context, joinOrLogin, child) => InkWell(
+                  onTap: () {
+                    joinOrLogin.toggle();
+                  },
+                  child: Text(
+                    !joinOrLogin.isJoin? "계정이 없으신가요? 가입하기" : "이미 계정이 있으신가요? 로그인하기",
+                    style: TextStyle(color: joinOrLogin.isJoin?Colors.red:Colors.blue),
+                  ),
+                ),
               ),
               Container(height: size.height * 0.05,)
             ],
@@ -69,7 +59,7 @@ class LoginView extends StatelessWidget {
       padding: const EdgeInsets.only(top: 60, left: 60, right: 60, bottom: 30),
       child: FittedBox(
         fit: BoxFit.contain,
-        child: Image.asset('images/loading.gif'),
+        child: CircleAvatar(backgroundImage: AssetImage('images/7pv.gif')),
       ),
     ),
   );
@@ -93,7 +83,7 @@ class LoginView extends StatelessWidget {
                 TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                        icon: Icon(Icons.email),
+                        icon: Icon(Icons.email, size: 20),
                         labelText: '이메일'
                     ),
                     validator: (String value) {
@@ -107,8 +97,9 @@ class LoginView extends StatelessWidget {
                 TextFormField(
                     obscureText: true,
                     controller: _passController,
-                    decoration: InputDecoration.collapsed(
-                        hintText: '비밀번호'
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.vpn_key, size: 20,),
+                        labelText: '비밀번호'
                     ),
                     validator: (String value) {
                       if(value.isEmpty) {
@@ -119,7 +110,9 @@ class LoginView extends StatelessWidget {
                     }
                 ),
                 Container(height: 20,),
-                Text('비밀번호를 잊어버리셨나요?'),
+                Consumer<JoinOrLogin>(
+                  builder: (context, joinOrLogin, child) => joinOrLogin.isJoin? Container(height: 0,) : Text('비밀번호를 잊어버리셨나요?')
+                ),
               ],
             ),
           ),
@@ -134,19 +127,64 @@ class LoginView extends StatelessWidget {
     bottom: 0,
     child: SizedBox(
       height: 45,
-      child: RaisedButton(
-        child: Text('로그인'),
-        color: Colors.blue,
-        textColor: Colors.white,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22)
+      child: Consumer<JoinOrLogin>(
+        builder: (context, joinOrLogin, child) => RaisedButton(
+          child: Text(joinOrLogin.isJoin?'회원가입':'로그인'),
+          color: joinOrLogin.isJoin?Colors.red:Colors.blue,
+          textColor: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22)
+          ),
+          onPressed: () {
+            if(_formKey.currentState.validate()) {
+              joinOrLogin.isJoin? _register(context) : _login(context);
+            }
+          },
         ),
-        onPressed: () {
-          if(_formKey.currentState.validate()) {
-            print('야호!!');
-          }
-        },
       ),
     ),
   );
+
+  void _register(BuildContext context) async {
+    final AuthResult result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passController.text);
+    final FirebaseUser user = result.user;
+
+    if(user == null) {
+      final snackBar = SnackBar(content: Text("다시 시도해주세요."),);
+      Scaffold.of(context).showSnackBar(snackBar);
+    }else {
+
+    }
+  }
+
+  void _login(BuildContext context) async {
+    try{
+      final AuthResult result = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passController.text);
+    }catch(e) {
+      final snackBar = SnackBar(content: Text("다시 시도해주세요."),);
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
+  }
+}
+
+class LoginBackground extends CustomPainter {
+  LoginBackground({@required this.isJoin});
+
+  final bool isJoin;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()..color = isJoin?Colors.red:Colors.blue;
+    canvas.drawCircle(Offset(size.width*0.5, size.height*0.2), size.height*0.5, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+
 }
