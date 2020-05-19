@@ -1,4 +1,5 @@
 import 'package:firstflutter/app/firebase_chat_app/splash.dart';
+import 'package:firstflutter/deditation_app/main.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
                 leading: Icon(Icons.chat_bubble),
                 title: Text('몰라 씨발'),
                 onTap: () {
-                  Navigator.of(context).push(_createRoute());
+                  Navigator.of(context).push(_createRoute(MeditationApp()));
                 },
               ),
               ListTile(
