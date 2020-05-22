@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firstflutter/app/firebase_chat_app/chat_page.dart';
 import 'package:firstflutter/app/firebase_chat_app/view/TopTitle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,10 @@ class MainPage extends StatelessWidget {
                   onPressed: () => { FirebaseAuth.instance.signOut() },
                 ),
               ],),
+            ),
+            IconButton(
+              icon: Icon(Icons.more_vert),
+              onPressed: () => { Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()),)},
             ),
           ],
         ),

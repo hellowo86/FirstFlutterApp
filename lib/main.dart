@@ -1,5 +1,5 @@
 import 'package:firstflutter/app/firebase_chat_app/splash.dart';
-import 'package:firstflutter/deditation_app/main.dart';
+import 'package:firstflutter/meditation_app/main.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -9,34 +9,45 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "경훈아 잘하자..",
-      home: Builder(
-        builder: (context) =>  Scaffold(
-          appBar: AppBar(
-            title: Text('경훈아 잘하자'),
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => Home(),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/firebase/chat': (context) => FireBaseChatApp(),
+      },
+    );
+  }
+}
+
+class Home extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('경훈아 잘하자'),
+      ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(
+            leading: Icon(Icons.chat_bubble),
+            title: Text('파이어베이스 채팅 앱'),
+            onTap: () {
+              Navigator.pushNamed(context, '/firebase/chat');
+            },
           ),
-          body: ListView(
-            children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.chat_bubble),
-                title: Text('파이어베이스 채팅 앱'),
-                onTap: () {
-                  Navigator.of(context).push(_createRoute(FireBaseChatApp()));
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.chat_bubble),
-                title: Text('몰라 씨발'),
-                onTap: () {
-                  Navigator.of(context).push(_createRoute(MeditationApp()));
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.phone),
-                title: Text('Phone'),
-              ),
-            ],
+          ListTile(
+            leading: Icon(Icons.chat_bubble),
+            title: Text('몰라 씨발'),
+            onTap: () {
+              Navigator.of(context).push(_createRoute(MeditationApp()));
+            },
           ),
-        ),
+          ListTile(
+            leading: Icon(Icons.phone),
+            title: Text('Phone'),
+          ),
+        ],
       ),
     );
   }
@@ -59,5 +70,3 @@ Route _createRoute(Widget widget) {
     },
   );
 }
-
-
