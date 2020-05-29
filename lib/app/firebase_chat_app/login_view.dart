@@ -165,6 +165,7 @@ class LoginView extends StatelessWidget {
           email: _emailController.text,
           password: _passController.text);
     }catch(e) {
+      print(e.toString());
       final snackBar = SnackBar(content: Text("다시 시도해주세요."),);
       Scaffold.of(context).showSnackBar(snackBar);
     }

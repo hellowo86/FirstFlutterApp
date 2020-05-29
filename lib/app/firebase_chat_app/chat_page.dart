@@ -197,8 +197,7 @@ class _ChatPageState extends State<ChatPage> {
                           .instance
                           .ref()
                           .child('chats/img_' + timestamp.toString() + '.jpg');
-                      StorageUploadTask uploadTask =
-                      storageReference.putFile(image);
+                      StorageUploadTask uploadTask = storageReference.putFile(image);
                       await uploadTask.onComplete;
                       String fileUrl = await storageReference.getDownloadURL();
                       _sendImage(messageText: null, imageUrl: fileUrl);

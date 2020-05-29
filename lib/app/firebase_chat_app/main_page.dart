@@ -21,7 +21,7 @@ class MainPage extends StatelessWidget {
               padding: EdgeInsets.all(20),
               child: Row(children: <Widget>[
                 Expanded(
-                  child: TopTitle(title: 'Chats'),
+                  child: TopTitle(title: 'Chat'),
                 ),
                 IconButton(
                   icon: Icon(Icons.more_vert),

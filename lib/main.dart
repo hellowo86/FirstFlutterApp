@@ -1,6 +1,8 @@
 import 'package:firstflutter/app/firebase_chat_app/splash.dart';
-import 'package:firstflutter/meditation_app/main.dart';
 import 'package:flutter/material.dart';
+
+import 'app/book_community_app/splash.dart';
+import 'app/meditation_app/main.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,6 +17,8 @@ class MyApp extends StatelessWidget {
         '/': (context) => Home(),
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/firebase/chat': (context) => FireBaseChatApp(),
+        '/book': (context) => BookCommunityApp(),
+
       },
     );
   }
@@ -38,14 +42,17 @@ class Home extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.chat_bubble),
-            title: Text('몰라 씨발'),
+            title: Text('명'),
             onTap: () {
               Navigator.of(context).push(_createRoute(MeditationApp()));
             },
           ),
           ListTile(
-            leading: Icon(Icons.phone),
-            title: Text('Phone'),
+            leading: Icon(Icons.book),
+            title: Text('책'),
+            onTap: () {
+              Navigator.pushNamed(context, '/book');
+            },
           ),
         ],
       ),
