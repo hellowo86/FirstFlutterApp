@@ -54,6 +54,7 @@ dependencies:
   webview_flutter: ^0.3.22+1
   devicelocale: ^0.2.3
   device_info: ^0.4.2+4
+  lottie: ^0.4.0
 
   # 명상 앱
   flutter_svg: ^0.17.4

@@ -82,7 +82,7 @@ class TopBar extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            NormalIcon("cancel", () {
+            NormalIcon("cancel", onTap: () {
               Navigator.pop(context);
             }, size: 15,),
           ],
@@ -110,7 +110,7 @@ class BottomBar extends StatelessWidget {
             Consumer<PageModel>(
               builder: (context, model, child) => Opacity(
                 opacity: model.canGoBack ? 1 : 0.5,
-                child: NormalIcon("arrow_back", () {
+                child: NormalIcon("arrow_back", onTap: () {
                   if(model.canGoBack) Provider.of<PageModel>(context).webViewController.goBack();
                 }),
               ),
@@ -118,21 +118,21 @@ class BottomBar extends StatelessWidget {
             Consumer<PageModel>(
               builder: (context, model, child) => Opacity(
                 opacity: model.canGoFoward ? 1 : 0.5,
-                child: NormalIcon("arrow_front", () {
+                child: NormalIcon("arrow_front", onTap: () {
                   if(model.canGoFoward) Provider.of<PageModel>(context).webViewController.goForward();
                 }),
               ),
             ),
-            NormalIcon("heart", () {
+            NormalIcon("heart", onTap: () {
               Navigator.pop(context);
             }),
-            NormalIcon("add_to_event", () {
+            NormalIcon("add_to_event", onTap: () {
               Navigator.pop(context);
             }),
-            NormalIcon("share", () {
+            NormalIcon("share", onTap: () {
               Navigator.pop(context);
             }),
-            NormalIcon("baseline_more_horiz_black_48dp", () {
+            NormalIcon("baseline_more_horiz_black_48dp", onTap: () {
               Navigator.pop(context);
             }),
           ],

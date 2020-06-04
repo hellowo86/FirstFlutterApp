@@ -28,8 +28,12 @@ class SialApp extends StatelessWidget {
       value: App(context),
       child: MaterialApp(
         theme: ThemeData(
-          primaryColor: blueColor,
-          textTheme: GoogleFonts.notoSansTextTheme(),
+          primaryColor: keyColor,
+          textTheme: GoogleFonts.notoSansTextTheme(
+              Theme.of(context).textTheme.apply(
+                bodyColor: textColor
+              )
+          ),
         ),
         home: Home(),
       ),

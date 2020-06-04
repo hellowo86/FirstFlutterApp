@@ -146,6 +146,10 @@ class Contents {
         this.habitCount});
 
   Contents.fromJson(Map<String, dynamic> json) {
+    setFromJson(json);
+  }
+
+  void setFromJson(Map<String, dynamic> json) {
     id = json['id'];
     oriId = json['oriId'];
     if (json['ctSubs'] != null) {
@@ -350,10 +354,10 @@ class AdUser {
   String youtube;
   String etc;
   int cntInvitation;
-  int score;
+  double score;
   int replyCnt;
   String snsTopicName;
-  int balances;
+  double balances;
   String regMonth;
   int cntLimitInvite;
 

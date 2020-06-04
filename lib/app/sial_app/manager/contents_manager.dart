@@ -87,18 +87,22 @@ class ContentsManager {
         print(contents.type.toString());
         print(contents.level);
         var sialClickRes = await Dio().post(_sialClickApi,
-            data: {
+            queryParameters: {
               "deviceId": App.deviceId,
               "lang": App.locale,
-              "ctId": contents.id,
+              "ctId": contents.id.toString(),
               "type": contents.type.toString(),
               "level": contents.level
             },
             options: Options(headers: _apiHeader));
-        print(sialClickRes.toString());
-//        Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {
-//          return ContentsPage(contents);
-//        }));
+        if(sialClickRes.data["err"] == 0) {
+          contents.setFromJson(sialClickRes.data["content"]);
+          Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {
+            return ContentsPage(contents);
+          }));
+        }else {
+
+        }
       } else {}
     } else {
       Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {

@@ -7,9 +7,10 @@ import '../constants.dart';
 class NormalIcon extends StatelessWidget {
   String icon;
   double size;
+  Color color;
   void Function() onTap;
 
-  NormalIcon(this.icon, this.onTap, {this.size = iconSize});
+  NormalIcon(this.icon, {this.onTap, this.size = iconSize, this.color = iconColor});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class NormalIcon extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           child: Image(
             image: AssetImage('images/sial/$icon.png'),
-            color: iconColor,
+            color: color,
             width: size,
             height: size,
           ),
