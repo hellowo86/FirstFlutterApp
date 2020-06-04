@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firstflutter/app/book_community_app/data/app.dart';
 import 'package:firstflutter/app/book_community_app/manager/book_manager.dart';
 import 'package:firstflutter/app/book_community_app/view/book_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,13 +11,19 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 
-import 'data/book.dart';
+import 'model/book.dart';
 
 class BookCommunityApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ThemeProvider(
-      child: MaterialApp(home: Home()),
+    return ChangeNotifierProvider<App>.value(
+      value: App(),
+      child: MaterialApp(
+        theme: ThemeData(
+          primaryColor: Colors.yellow,
+        ),
+        home: Home(),
+      ),
     );
   }
 }
@@ -25,19 +32,37 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          child: Column(
-            children: [
-              OutlineButton(
-                child: Text("sss"),
-                onPressed: () async {},
-              ),
-              MyStatefulWidget(),
-            ],
+        body: SafeArea(
+          child: Container(
+            child: Column(
+              children: [
+                OutlineButton(
+                  child: Text("hjjh"),
+                  onPressed: () async {},
+                ),
+                MyStatefulWidget(),
+              ],
+            ),
           ),
         ),
-      ),
+        bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            onTap: (index) => {},
+            currentIndex: 0,
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                title: Text('Home'),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.mail),
+                title: Text('First'),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                title: Text('Second'),
+              )
+            ])
     );
   }
 }
@@ -50,12 +75,10 @@ class MyStatefulWidget extends StatefulWidget {
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-
   Widget build(BuildContext context) {
-    print("gagag");
-
     return FutureBuilder<List>(
-      future: new BookManager().getBookList("query"), // a previously-obtained Future<List> or null
+      future: new BookManager().getBookList("query"),
+      // a previously-obtained Future<List> or null
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         List<Widget> children;
         if (snapshot.hasData) {

@@ -1,10 +1,14 @@
 import 'package:firstflutter/app/firebase_chat_app/splash.dart';
+import 'package:firstflutter/app/sial_app/main_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'app/book_community_app/splash.dart';
 import 'app/meditation_app/main.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -18,7 +22,7 @@ class MyApp extends StatelessWidget {
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/firebase/chat': (context) => FireBaseChatApp(),
         '/book': (context) => BookCommunityApp(),
-
+        '/sial': (context) => SialApp(),
       },
     );
   }
@@ -52,6 +56,13 @@ class Home extends StatelessWidget {
             title: Text('책'),
             onTap: () {
               Navigator.pushNamed(context, '/book');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.star),
+            title: Text('시간을 알차게'),
+            onTap: () {
+              Navigator.pushNamed(context, '/sial');
             },
           ),
         ],

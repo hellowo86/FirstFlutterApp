@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:firstflutter/app/book_community_app/data/book.dart';
+import 'package:firstflutter/app/book_community_app/model/book.dart';
 
 class BookManager {
   final String _bookListApi = "https://openapi.naver.com/v1/search/book.json";

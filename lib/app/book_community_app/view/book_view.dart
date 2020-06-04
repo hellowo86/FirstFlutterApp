@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firstflutter/app/book_community_app/data/book.dart';
+import 'package:firstflutter/app/book_community_app/model/book.dart';
 import 'package:flutter/material.dart';
 
 class BookView extends StatelessWidget {
