@@ -268,6 +268,10 @@ class Contents {
         + "?level=${level}"
         + (authToken.isNotEmpty ? "&token=$authToken" : "");
   }
+
+  String getAllkeyword() {
+    return "${keyword1.isEmpty ? "" : "#$keyword1 "}${keyword2.isEmpty ? "" : "#$keyword2 "}${keyword3.isEmpty ? "" : "#$keyword3 "}";
+  }
 }
 
 class CtSubs {

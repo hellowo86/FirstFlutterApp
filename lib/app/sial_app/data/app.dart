@@ -7,9 +7,7 @@ import 'package:flutter/services.dart';
 
 class App extends ChangeNotifier {
   String authToken = "";
-  bool _isJoin = true;
-
-  bool get isJoin => _isJoin;
+  int currentTab = 0;
 
   static String languageCode;
   static String locale;
@@ -42,10 +40,11 @@ class App extends ChangeNotifier {
       print('Failed to get platform version');
     }
   }
-
-  void toggle() {
-    _isJoin = !_isJoin;
-    notifyListeners();
+  void setMainTab(index) {
+    if(index != currentTab) {
+      currentTab = index;
+      notifyListeners();
+    }
   }
 }
 

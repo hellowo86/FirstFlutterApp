@@ -1,9 +1,13 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firstflutter/app/sial_app/account_page.dart';
 import 'package:firstflutter/app/sial_app/constants.dart';
+import 'package:firstflutter/app/sial_app/like_list_page.dart';
 import 'package:firstflutter/app/sial_app/manager/contents_manager.dart';
 import 'package:firstflutter/app/sial_app/model/contents_group.dart';
+import 'package:firstflutter/app/sial_app/search_page.dart';
+import 'package:firstflutter/app/sial_app/view/normal_icon.dart';
 import 'package:firstflutter/app/sial_app/view/normal_text.dart';
 import 'package:firstflutter/app/sial_app/view/top_title_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,11 +33,8 @@ class SialApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(
           primaryColor: keyColor,
-          textTheme: GoogleFonts.notoSansTextTheme(
-              Theme.of(context).textTheme.apply(
-                bodyColor: textColor
-              )
-          ),
+          accentColor: keyColor,
+          textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme.apply(bodyColor: textColor)),
         ),
         home: Home(),
       ),
@@ -50,12 +51,22 @@ class Home extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(color: Colors.white),
           child: SafeArea(
-            child: Stack(
-              children: [
-                SialMain(),
-                TopBar(),
-                BottomBar(),
-              ],
+            child: Consumer<App>(
+              builder: (context, app, widget) {
+                Widget child;
+                if(app.currentTab == 1) child = SearchPage();
+                else if(app.currentTab == 2) child = LikeListPage();
+                else if(app.currentTab == 3) child = AccountPage();
+                else child = SialMain();
+                return Column(
+                  children: [
+                    Expanded(
+                      child: child,
+                    ),
+                    BottomBar(app),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -70,22 +81,19 @@ class TopBar extends StatelessWidget {
     return Container(
       height: 70,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+        padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            Image(
+              image: AssetImage('images/sial/typo_logo.png'),
+              width: 150,
+            ),
             Expanded(
-              child: TopTitleText(title: '시간을 알차게'),
+              child: Container(),
             ),
-            InkWell(
-              child: Image(
-                image: AssetImage('images/sial/main_search_grey.png'),
-                color: secondTextColor,
-                width: 18,
-                height: 18,
-              ),
-              onTap: () => {},
-            ),
+            NormalIcon("setting", onTap: () {}),
+            NormalIcon("search", onTap: () {}),
           ],
         ),
       ),
@@ -94,56 +102,147 @@ class TopBar extends StatelessWidget {
 }
 
 class BottomBar extends StatelessWidget {
+  App app;
+
+  BottomBar(this.app);
+
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
-        ),
-        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            InkWell(
-              child: Image(
-                image: AssetImage('images/sial/home.png'),
-                color: secondTextColor,
-                width: 18,
-                height: 18,
+    return Container(
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 2,
+            offset: Offset(0, 0), // changes position of shadow
+          ),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          InkWell(
+            onTap: () {
+              app.setMainTab(0);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image(
+                    image: AssetImage('images/sial/home.png'),
+                    color: app.currentTab == 0 ? keyColor : subColor,
+                    width: 17,
+                    height: 17,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "홈",
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: app.currentTab == 0 ? keyColor : subColor,
+                    ),
+                  )
+                ],
               ),
-              onTap: () => {},
             ),
-            InkWell(
-              child: Image(
-                image: AssetImage('images/sial/main_search_grey.png'),
-                color: secondTextColor,
-                width: 18,
-                height: 18,
+          ),
+          InkWell(
+            onTap: () {
+              app.setMainTab(1);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image(
+                    image: AssetImage('images/sial/list.png'),
+                    color: app.currentTab == 1 ? keyColor : subColor,
+                    width: 17,
+                    height: 17,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "목록",
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: app.currentTab == 1 ? keyColor : subColor,
+                    ),
+                  )
+                ],
               ),
-              onTap: () => {},
             ),
-            InkWell(
-              child: Image(
-                image: AssetImage('images/sial/sheet_attendees.png'),
-                color: secondTextColor,
-                width: 18,
-                height: 18,
+          ),
+          InkWell(
+            onTap: () {
+              app.setMainTab(2);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image(
+                    image: AssetImage('images/sial/search.png'),
+                    color: app.currentTab == 2 ? keyColor : subColor,
+                    width: 17,
+                    height: 17,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "검색",
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: app.currentTab == 2 ? keyColor : subColor,
+                    ),
+                  )
+                ],
               ),
-              onTap: () => {},
             ),
-          ],
-        ),
+          ),
+          InkWell(
+            onTap: () {
+              app.setMainTab(3);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image(
+                    image: AssetImage('images/sial/account.png'),
+                    color: app.currentTab == 3 ? keyColor : subColor,
+                    width: 17,
+                    height: 17,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "계정",
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: app.currentTab == 3 ? keyColor : subColor,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -163,57 +262,57 @@ class _MyStatefulWidgetState extends State<SialMain> {
 
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 70, 0, 60),
-      child: FutureBuilder<List>(
-        future: new ContentsManager().getSialMain(),
-        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          if (snapshot.hasData && snapshot.data.isNotEmpty) {
-            snapshot.data.forEach((element) {
-              print(element.title);
-            });
-            return Expanded(
-              child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(),
-                  child: Column(
-                    children: [
-                      _makeMdsPickPager(size, snapshot.data[0]),
-                      ..._makeContentsGroupScroll(size, snapshot.data.length > 1 ? snapshot.data.sublist(1, snapshot.data.length) : List())
-                    ],
+    return Column(
+      children: [
+        TopBar(),
+        Divider(height: 0.4, thickness: 0.4, color: lineColor,),
+        FutureBuilder<List>(
+          future: ContentsManager().getSialMain(),
+          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+            if (snapshot.hasData && snapshot.data.isNotEmpty) {
+              return Expanded(
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(),
+                    child: Column(
+                      children: [
+                        _makeMdsPickPager(size, snapshot.data[0]),
+                        ..._makeContentsGroupScroll(size, snapshot.data.length > 1 ? snapshot.data.sublist(1, snapshot.data.length) : List())
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Expanded(
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 60,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error: ${snapshot.error}'),
-                  )
-                ],
-              ),
-            );
-          } else {
-            return Expanded(
-              child: Center(
-                child: SizedBox(
-                  child: CircularProgressIndicator(),
-                  width: 20,
-                  height: 20,
+              );
+            } else if (snapshot.hasError) {
+              return Expanded(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('Error: ${snapshot.error}'),
+                    )
+                  ],
                 ),
-              ),
-            );
-          }
-        },
-      ),
+              );
+            } else {
+              return Expanded(
+                child: Center(
+                  child: SizedBox(
+                    child: CircularProgressIndicator(),
+                    width: 20,
+                    height: 20,
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+      ],
     );
   }
 
@@ -226,15 +325,15 @@ class _MyStatefulWidgetState extends State<SialMain> {
               itemBuilder: (context, position) {
                 Contents contents = mdsPick.list[position];
                 return GestureDetector(
-                  onTap: (){
-                    ContentsManager().pushContentsPage(context, contents, (){});
+                  onTap: () {
+                    ContentsManager().pushContentsPage(context, contents, () {});
                   },
                   child: Stack(
                     fit: StackFit.expand,
                     alignment: Alignment.bottomCenter,
                     children: [
                       Hero(
-                        tag:contents.imgT,
+                        tag: contents.imgT,
                         child: CachedNetworkImage(
                           imageUrl: contents.getImageUrl(),
                           fit: BoxFit.cover,
@@ -372,7 +471,7 @@ class _MyStatefulWidgetState extends State<SialMain> {
   Widget _makeContentsCard(Size size, Contents contents) {
     return GestureDetector(
       onTap: () {
-        ContentsManager().pushContentsPage(context, contents, (){});
+        ContentsManager().pushContentsPage(context, contents, () {});
       },
       child: SizedBox(
         width: 175,
@@ -386,8 +485,8 @@ class _MyStatefulWidgetState extends State<SialMain> {
                   width: 175,
                   height: 175,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15.0),
-                    child:  CachedNetworkImage(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
                       imageUrl: contents.getImageUrl(),
                       fit: BoxFit.cover,
                     ),
@@ -397,7 +496,7 @@ class _MyStatefulWidgetState extends State<SialMain> {
                   width: 175,
                   height: 175,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(15)), border: Border.all(color: Color(0x30000000), width: 0.5)),
+                      borderRadius: BorderRadius.all(Radius.circular(8)), border: Border.all(color: Color(0x30000000), width: 0.5)),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10),

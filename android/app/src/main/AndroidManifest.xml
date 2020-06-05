@@ -44,5 +44,9 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- 구글 위치 API KEY -->
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBVObhzbaNDyRsD0V-tVvIeCOakc3_SwkU"/>
     </application>
 </manifest>

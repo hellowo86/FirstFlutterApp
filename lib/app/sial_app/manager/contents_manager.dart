@@ -4,6 +4,7 @@ import 'package:firstflutter/app/sial_app/data/app.dart';
 import 'package:firstflutter/app/sial_app/inapp_web_page.dart';
 import 'package:firstflutter/app/sial_app/model/contents.dart';
 import 'package:firstflutter/app/sial_app/model/contents_group.dart';
+import 'package:firstflutter/app/sial_app/model/contents_review.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
@@ -62,6 +63,22 @@ class ContentsManager {
     return Future.value(result);
   }
 
+  Future<List> getContensReviews(Contents contents, int page) async {
+    List<dynamic> result = List();
+    var res = await Dio().get(api_prefix + "api/comments/${contents.id}?page=$page&lang=${App.locale}", options: Options(headers: _apiHeader));
+    if(res.data["err"] == 0) {
+      var userId = res.data['userId'];
+      var totalPages = res.data['totalPages'];
+      var totalElements = res.data['totalElements'];
+      var items = (res.data['page']['content'] as List<dynamic>).map((e) => ContentsReview.fromJson(e)).toList();
+      result.add(userId);
+      result.add(totalPages);
+      result.add(totalElements);
+      result.add(items);
+    }
+    return Future.value(result);
+  }
+
   static String getContentsTypeText(Contents contents) {
     if (contents.isActivity()) {
       return activityType[contents.eventType];
@@ -81,11 +98,6 @@ class ContentsManager {
   void pushContentsPage(BuildContext context, Contents contents, void Function() callback, {isClick = true}) async {
     if (contents.isDirect == 0 || contents.isDirect == 5) {
       if (isClick) {
-        print(App.deviceId);
-        print(App.languageCode);
-        print(contents.id);
-        print(contents.type.toString());
-        print(contents.level);
         var sialClickRes = await Dio().post(_sialClickApi,
             queryParameters: {
               "deviceId": App.deviceId,
