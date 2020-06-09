@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'constants.dart';
+import 'data/app.dart';
+import 'login_page.dart';
 import 'manager/contents_manager.dart';
 import 'view/normal_icon.dart';
 
@@ -15,6 +18,25 @@ class PageModel extends ChangeNotifier {
 }
 
 class AccountPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<App>(
+      builder: (context, app, widget) {
+        if (!app.isLogin()) {
+          return LoginPage();
+        } else {
+          return ProfileView(app);
+        }
+      },
+    );
+  }
+}
+
+class ProfileView extends StatelessWidget {
+  App app;
+
+  ProfileView(this.app);
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PageModel>.value(
@@ -42,7 +64,9 @@ class AccountPage extends StatelessWidget {
                                 backgroundColor: subColor,
                                 child: CircleAvatar(
                                   radius: 60,
-                                  backgroundImage: AssetImage("images/sial/default_people_img.png"),
+                                  backgroundImage: (app.imgT != null && app.imgT.isNotEmpty)
+                                      ? NetworkImage(app.imgT)
+                                      : AssetImage("images/sial/default_people_img.png"),
                                 ),
                               ),
                               Padding(
@@ -78,10 +102,8 @@ class AccountPage extends StatelessWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
-                                    width: 100,
-                                      child: Text("이름", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                                  Text("sssss", style: TextStyle(fontSize: 14)),
+                                  Container(width: 100, child: Text("이름", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                                  Text(app.name, style: TextStyle(fontSize: 13)),
                                 ],
                               ),
                             ),
@@ -90,10 +112,8 @@ class AccountPage extends StatelessWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
-                                      width: 100,
-                                      child: Text("이메일", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                                  Text("ssss", style: TextStyle(fontSize: 14)),
+                                  Container(width: 100, child: Text("이메일", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                                  Text(app.email, style: TextStyle(fontSize: 13)),
                                 ],
                               ),
                             )

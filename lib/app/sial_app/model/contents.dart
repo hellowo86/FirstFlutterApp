@@ -233,7 +233,7 @@ class Contents {
   }
 
   String getImageUrl() {
-    return imgT.startsWith('http') ? imgT : image_url_prefix + imgT;
+    return imgT.startsWith('http') ? imgT : imgDomain + imgT;
   }
 
   bool isActivity() => type == 0;
@@ -264,8 +264,8 @@ class Contents {
   }
 
   String getWebUrl(String authToken) {
-    return api_prefix + "web/bridge/" + linkKey
-        + "?level=${level}"
+    return apiDomain + "web/bridge/" + linkKey
+        + "?level=$level"
         + (authToken.isNotEmpty ? "&token=$authToken" : "");
   }
 

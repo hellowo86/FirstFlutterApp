@@ -149,7 +149,7 @@ class ContentsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String initialUrl = contents.getWebUrl(Provider.of<App>(context).authToken);
+    String initialUrl = contents.getWebUrl(App.token);
     return Expanded(
       child: WebView(
         initialUrl: initialUrl,

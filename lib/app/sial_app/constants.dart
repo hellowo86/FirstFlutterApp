@@ -15,5 +15,7 @@ const almostWhiteColor = Color(0xfff4f4f4);
 const iconSize = 17.0;
 
 const server = "dev";
-const api_prefix = server == "prd" ? "https://timeblocks.com/" : "http://dev.gettimeblocks.com/";
-const image_url_prefix = server == "prd" ? "https://img.gettimeblocks.com/" : "http://imgdev.gettimeblocks.com/";
+const apiDomain = server == "prd" ? "https://timeblocks.com/" : "http://dev.gettimeblocks.com/";
+const imgDomain = server == "prd" ? "https://img.gettimeblocks.com/" : "http://imgdev.gettimeblocks.com/";
+
+const contentsOrders = ["인기순", "최신순", "거리순"];

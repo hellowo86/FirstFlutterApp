@@ -17,6 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:skeleton_text/skeleton_text.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'contents_page.dart';
@@ -25,11 +26,15 @@ import 'model/contents.dart';
 import 'utils.dart';
 import 'view/header_title_text.dart';
 
+const cardSize = 175.0;
+
 class SialApp extends StatelessWidget {
+  PageController controller = PageController();
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<App>.value(
-      value: App(context),
+      value: App(context, controller),
       child: MaterialApp(
         theme: ThemeData(
           primaryColor: keyColor,
@@ -43,9 +48,11 @@ class SialApp extends StatelessWidget {
 }
 
 class Home extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: getSystemUiOverlayStyle(),
         child: Container(
@@ -53,17 +60,20 @@ class Home extends StatelessWidget {
           child: SafeArea(
             child: Consumer<App>(
               builder: (context, app, widget) {
-                Widget child;
-                if(app.currentTab == 1) child = SearchPage();
-                else if(app.currentTab == 2) child = LikeListPage();
-                else if(app.currentTab == 3) child = AccountPage();
-                else child = SialMain();
                 return Column(
                   children: [
                     Expanded(
-                      child: child,
+                      child: PageView(
+                        controller: app.controller,
+                        children: [
+                          SialMain(),
+                          SearchPage(),
+                          LikeListPage(),
+                          AccountPage(),
+                        ],
+                      ),
                     ),
-                    BottomBar(app),
+                    BottomBar(),
                   ],
                 );
               },
@@ -93,7 +103,9 @@ class TopBar extends StatelessWidget {
               child: Container(),
             ),
             NormalIcon("setting", onTap: () {}),
-            NormalIcon("search", onTap: () {}),
+            NormalIcon("search", onTap: () {
+              Provider.of<App>(context).startMainSearch();
+            }),
           ],
         ),
       ),
@@ -102,12 +114,10 @@ class TopBar extends StatelessWidget {
 }
 
 class BottomBar extends StatelessWidget {
-  App app;
-
-  BottomBar(this.app);
 
   @override
   Widget build(BuildContext context) {
+    App app = Provider.of<App>(context);
     return Container(
       height: 70,
       decoration: BoxDecoration(
@@ -194,7 +204,7 @@ class BottomBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image(
-                    image: AssetImage('images/sial/search.png'),
+                    image: AssetImage('images/sial/like_list.png'),
                     color: app.currentTab == 2 ? keyColor : subColor,
                     width: 17,
                     height: 17,
@@ -203,7 +213,7 @@ class BottomBar extends StatelessWidget {
                     height: 5,
                   ),
                   Text(
-                    "검색",
+                    "좋아요",
                     style: TextStyle(
                       fontSize: 9,
                       color: app.currentTab == 2 ? keyColor : subColor,
@@ -249,13 +259,12 @@ class BottomBar extends StatelessWidget {
 }
 
 class SialMain extends StatefulWidget {
-  SialMain({Key key}) : super(key: key);
 
   @override
   _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
 }
 
-class _MyStatefulWidgetState extends State<SialMain> {
+class _MyStatefulWidgetState extends State<SialMain> with AutomaticKeepAliveClientMixin<SialMain>  {
   PageController _pagerController = PageController(
     initialPage: 0,
   );
@@ -265,7 +274,11 @@ class _MyStatefulWidgetState extends State<SialMain> {
     return Column(
       children: [
         TopBar(),
-        Divider(height: 0.4, thickness: 0.4, color: lineColor,),
+        Divider(
+          height: 0.4,
+          thickness: 0.4,
+          color: lineColor,
+        ),
         FutureBuilder<List>(
           future: ContentsManager().getSialMain(),
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
@@ -277,7 +290,8 @@ class _MyStatefulWidgetState extends State<SialMain> {
                     child: Column(
                       children: [
                         _makeMdsPickPager(size, snapshot.data[0]),
-                        ..._makeContentsGroupScroll(size, snapshot.data.length > 1 ? snapshot.data.sublist(1, snapshot.data.length) : List())
+                        ..._makeContentsGroupScroll(
+                            size, snapshot.data.length > 1 ? snapshot.data.sublist(1, snapshot.data.length) : List())
                       ],
                     ),
                   ),
@@ -301,11 +315,54 @@ class _MyStatefulWidgetState extends State<SialMain> {
               );
             } else {
               return Expanded(
-                child: Center(
-                  child: SizedBox(
-                    child: CircularProgressIndicator(),
-                    width: 20,
-                    height: 20,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SkeletonAnimation(
+                        child: Container(
+                          height: size.width,
+                          width: size.width,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(25.0),
+                        child: SkeletonAnimation(
+                          child: Container(
+                            width: 250,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(25, 0, 0, 0),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              _cardSkeleton(),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              _cardSkeleton(),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              _cardSkeleton(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -315,6 +372,45 @@ class _MyStatefulWidgetState extends State<SialMain> {
       ],
     );
   }
+
+  Widget _cardSkeleton() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SkeletonAnimation(
+            child: Container(
+              width: cardSize,
+              height: cardSize,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          SkeletonAnimation(
+            child: Container(
+              width: cardSize,
+              height: 14,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          SkeletonAnimation(
+            child: Container(
+              width: 150,
+              height: 14,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+              ),
+            ),
+          ),
+        ],
+      );
 
   Widget _makeMdsPickPager(Size size, ContentsGroup mdsPick) => Container(
         height: size.width,
@@ -474,7 +570,7 @@ class _MyStatefulWidgetState extends State<SialMain> {
         ContentsManager().pushContentsPage(context, contents, () {});
       },
       child: SizedBox(
-        width: 175,
+        width: cardSize,
         height: 290,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,8 +578,8 @@ class _MyStatefulWidgetState extends State<SialMain> {
             Stack(
               children: [
                 SizedBox(
-                  width: 175,
-                  height: 175,
+                  width: cardSize,
+                  height: cardSize,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: CachedNetworkImage(
@@ -493,8 +589,8 @@ class _MyStatefulWidgetState extends State<SialMain> {
                   ),
                 ),
                 Container(
-                  width: 175,
-                  height: 175,
+                  width: cardSize,
+                  height: cardSize,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(8)), border: Border.all(color: Color(0x30000000), width: 0.5)),
                 ),
@@ -564,4 +660,7 @@ class _MyStatefulWidgetState extends State<SialMain> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -22,11 +22,35 @@ class ContentsManager {
     //초기화 코드
   }
 
-  final String _sialMainApi = api_prefix + "api/ctMain/main";
-  final String _sialMdsPickApi = api_prefix + "api/ctMain/mainTop";
-  final String _sialClickApi = api_prefix + "api/clicks/content50";
-  final Map<String, dynamic> _apiHeader = {
-    "x-auth-token": "",
+  final String _sialMainApi = apiDomain + "api/ctMain/main";
+  final String _sialMdsPickApi = apiDomain + "api/ctMain/mainTop";
+  final String _sialClickApi = apiDomain + "api/clicks/content50";
+
+  Map<String, dynamic> makeApiHeader() => {
+        "x-auth-token": App.token,
+      };
+
+  static final Map<String, String> categories = {
+    "1": "인테리어,가구",
+    "2": "가전,디지털",
+    "3": "다이어트,건강",
+    "4": "도서",
+    "5": "레저,스포츠",
+    "6": "맛집,푸드",
+    "7": "뷰티,미용",
+    "8": "생활",
+    "9": "여가,취미",
+    "10": "반려동물",
+    "11": "여행",
+    "12": "문화,예술",
+    "13": "가족,육아",
+    "14": "음악",
+    "15": "자동차",
+    "16": "패션",
+    "17": "비지니스,경제",
+    "21": "교육,외국어",
+    "19": "IT,과학",
+    "22": "게임,오락",
   };
 
   static final Map<String, String> activityType = {
@@ -54,24 +78,90 @@ class ContentsManager {
     "62": "축제",
   };
 
+  static final freeFilters = ["유료", "무료"];
+  static final dateFilters = ["오늘", "내일", "이번주", "이번주말", "다음주"];
+
   Future<List> getSialMain() async {
     List<ContentsGroup> result = List();
-    var sialMainRes = await Dio().get(_sialMainApi, options: Options(headers: _apiHeader));
+    var sialMainRes = await Dio().get(_sialMainApi, options: Options(headers: makeApiHeader()));
     result.addAll((sialMainRes.data["ret"] as List<dynamic>).map((e) => ContentsGroup.fromJson(e)).toList());
-    var sialMdsRes = await Dio().get(_sialMdsPickApi, options: Options(headers: _apiHeader));
+    var sialMdsRes = await Dio().get(_sialMdsPickApi, options: Options(headers: makeApiHeader()));
     result.insertAll(0, (sialMdsRes.data["ret"] as List<dynamic>).map((e) => ContentsGroup.fromJson(e)).toList());
     return Future.value(result);
   }
 
   Future<List> getContensReviews(Contents contents, int page) async {
     List<dynamic> result = List();
-    var res = await Dio().get(api_prefix + "api/comments/${contents.id}?page=$page&lang=${App.locale}", options: Options(headers: _apiHeader));
-    if(res.data["err"] == 0) {
+    var res = await Dio()
+        .get(apiDomain + "api/comments/${contents.id}?page=$page&lang=${App.locale}", options: Options(headers: makeApiHeader()));
+    if (res.data["err"] == 0) {
       var userId = res.data['userId'];
       var totalPages = res.data['totalPages'];
       var totalElements = res.data['totalElements'];
       var items = (res.data['page']['content'] as List<dynamic>).map((e) => ContentsReview.fromJson(e)).toList();
       result.add(userId);
+      result.add(totalPages);
+      result.add(totalElements);
+      result.add(items);
+    }
+    return Future.value(result);
+  }
+
+  Future<List> getContentsListWithFilter(Map<String, dynamic> filters) async {
+    List<dynamic> result = List();
+    var url = apiDomain + "api/ctMain/list";
+    var type = filters.containsKey("type") ? filters["type"] : 2;
+    url += "?type=$type";
+
+    if (filters.containsKey("listName")) url += "&listName=${filters["listName"]}";
+    if (filters.containsKey("order")) url += "&order=${filters["order"]}";
+
+    if (type == 2) {
+      if (filters.containsKey("far")) {
+        var far = filters["far"];
+        url += "&far=$far";
+        if (far > 0) {
+          url += "&slat=${filters["slat"]}";
+          url += "&slng=${filters["slng"]}";
+        }
+      }
+
+      if (filters.containsKey("day")) {
+        var day = filters["day"];
+        url += "&day=${filters["day"]}";
+        if (day == 9) {
+          url += "&startDay=${filters["startDay"]}";
+          url += "&endDay=${filters["endDay"]}";
+        }
+      }
+
+      if (filters.containsKey("free")) url += "&free=${filters["free"]}";
+    }
+
+    if (filters.containsKey("eventType")) {
+      var subTitle = filters["eventType"] as Set<String>;
+      subTitle.forEach((element) {
+        url += "&eventType=$element";
+      });
+    }
+
+    if (filters.containsKey("category")) {
+      var category = filters["category"] as Set<String>;
+      category.forEach((element) {
+        url += "&category=$element";
+      });
+    }
+
+    if (filters.containsKey("page")) url += "&page=${filters["page"]}";
+    if (filters.containsKey("searchStr") && (filters["searchStr"] as String).isNotEmpty) url += "&searchStr=${filters["searchStr"]}";
+    if (filters.containsKey("scrapType") && (filters["scrapType"] as String).isNotEmpty) url += "&scrapType=${filters["scrapType"]}";
+
+    print("" + url);
+    var res = await Dio().get(url, options: Options(headers: makeApiHeader()));
+    if (res.data["err"] == 0) {
+      var totalPages = res.data['totalPages'];
+      var totalElements = res.data['totalElements'];
+      var items = (res.data['ret'] as List<dynamic>).map((e) => Contents.fromJson(e)).toList();
       result.add(totalPages);
       result.add(totalElements);
       result.add(items);
@@ -106,15 +196,13 @@ class ContentsManager {
               "type": contents.type.toString(),
               "level": contents.level
             },
-            options: Options(headers: _apiHeader));
-        if(sialClickRes.data["err"] == 0) {
+            options: Options(headers: makeApiHeader()));
+        if (sialClickRes.data["err"] == 0) {
           contents.setFromJson(sialClickRes.data["content"]);
           Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {
             return ContentsPage(contents);
           }));
-        }else {
-
-        }
+        } else {}
       } else {}
     } else {
       Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {

@@ -412,7 +412,7 @@ class _StepViewState extends State<StepView> {
         children: [
           if (mainImg != null && mainImg.isNotEmpty)
             CachedNetworkImage(
-              imageUrl: image_url_prefix + mainImg,
+              imageUrl: imgDomain + mainImg,
               fit: BoxFit.fitWidth,
             ),
           if (_item.img2T != null && _item.img2T.isNotEmpty)
@@ -452,7 +452,7 @@ class _StepViewState extends State<StepView> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15.0),
             child: CachedNetworkImage(
-                imageUrl: image_url_prefix + imgUrl,
+                imageUrl: imgDomain + imgUrl,
                 fit: BoxFit.cover,
                 color: mainImg == imgUrl ? Color(0x00000000) : Color(0x90000000),
                 colorBlendMode: BlendMode.darken),
@@ -495,7 +495,7 @@ class AuthorView extends StatelessWidget {
                     backgroundColor: lineColor,
                     child: CircleAvatar(
                       radius: 39,
-                      backgroundImage: NetworkImage(image_url_prefix + author.imgT),
+                      backgroundImage: NetworkImage(imgDomain + author.imgT),
                     ),
                   ),
                   SizedBox(
@@ -650,7 +650,7 @@ class _ContentsReviewListState extends State<ContentsReviewList> {
                                   backgroundColor: lineColor,
                                   child: CircleAvatar(
                                     radius: 22,
-                                    backgroundImage: NetworkImage(image_url_prefix + review.user.imgT),
+                                    backgroundImage: NetworkImage(imgDomain + review.user.imgT),
                                   ),
                                 ),
                                 SizedBox(
