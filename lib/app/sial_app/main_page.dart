@@ -6,6 +6,7 @@ import 'package:firstflutter/app/sial_app/constants.dart';
 import 'package:firstflutter/app/sial_app/like_list_page.dart';
 import 'package:firstflutter/app/sial_app/manager/contents_manager.dart';
 import 'package:firstflutter/app/sial_app/model/contents_group.dart';
+import 'package:firstflutter/app/sial_app/profiling_page.dart';
 import 'package:firstflutter/app/sial_app/search_page.dart';
 import 'package:firstflutter/app/sial_app/view/normal_icon.dart';
 import 'package:firstflutter/app/sial_app/view/normal_text.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -64,6 +66,7 @@ class Home extends StatelessWidget {
                   children: [
                     Expanded(
                       child: PageView(
+                        physics:new NeverScrollableScrollPhysics(),
                         controller: app.controller,
                         children: [
                           SialMain(),
@@ -102,7 +105,11 @@ class TopBar extends StatelessWidget {
             Expanded(
               child: Container(),
             ),
-            NormalIcon("setting", onTap: () {}),
+            NormalIcon("setting", onTap: () {
+              Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {
+                return ProfilingPage();
+              }));
+            }),
             NormalIcon("search", onTap: () {
               Provider.of<App>(context).startMainSearch();
             }),
@@ -136,119 +143,131 @@ class BottomBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          InkWell(
-            onTap: () {
-              app.setMainTab(0);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image(
-                    image: AssetImage('images/sial/home.png'),
-                    color: app.currentTab == 0 ? keyColor : subColor,
-                    width: 17,
-                    height: 17,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "홈",
-                    style: TextStyle(
-                      fontSize: 9,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                app.setMainTab(0);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image(
+                      image: AssetImage('images/sial/home.png'),
                       color: app.currentTab == 0 ? keyColor : subColor,
+                      width: 17,
+                      height: 17,
                     ),
-                  )
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "홈",
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: app.currentTab == 0 ? keyColor : subColor,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-          InkWell(
-            onTap: () {
-              app.setMainTab(1);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image(
-                    image: AssetImage('images/sial/list.png'),
-                    color: app.currentTab == 1 ? keyColor : subColor,
-                    width: 17,
-                    height: 17,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "목록",
-                    style: TextStyle(
-                      fontSize: 9,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                app.setMainTab(1);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image(
+                      image: AssetImage('images/sial/list.png'),
                       color: app.currentTab == 1 ? keyColor : subColor,
+                      width: 17,
+                      height: 17,
                     ),
-                  )
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "목록",
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: app.currentTab == 1 ? keyColor : subColor,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-          InkWell(
-            onTap: () {
-              app.setMainTab(2);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image(
-                    image: AssetImage('images/sial/like_list.png'),
-                    color: app.currentTab == 2 ? keyColor : subColor,
-                    width: 17,
-                    height: 17,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "좋아요",
-                    style: TextStyle(
-                      fontSize: 9,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                app.setMainTab(2);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image(
+                      image: AssetImage('images/sial/like_list.png'),
                       color: app.currentTab == 2 ? keyColor : subColor,
+                      width: 17,
+                      height: 17,
                     ),
-                  )
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "좋아요",
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: app.currentTab == 2 ? keyColor : subColor,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-          InkWell(
-            onTap: () {
-              app.setMainTab(3);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image(
-                    image: AssetImage('images/sial/account.png'),
-                    color: app.currentTab == 3 ? keyColor : subColor,
-                    width: 17,
-                    height: 17,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "계정",
-                    style: TextStyle(
-                      fontSize: 9,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                app.setMainTab(3);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image(
+                      image: AssetImage('images/sial/account.png'),
                       color: app.currentTab == 3 ? keyColor : subColor,
+                      width: 17,
+                      height: 17,
                     ),
-                  )
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "계정",
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: app.currentTab == 3 ? keyColor : subColor,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -594,20 +613,7 @@ class _MyStatefulWidgetState extends State<SialMain> with AutomaticKeepAliveClie
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(8)), border: Border.all(color: Color(0x30000000), width: 0.5)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: InkWell(
-                      child: Image(
-                        image: AssetImage('images/sial/inspire_heart.png'),
-                        width: 18,
-                        height: 18,
-                      ),
-                      onTap: () => {},
-                    ),
-                  ),
-                ),
+                LikeButton(contents)
               ],
             ),
             Padding(
@@ -663,4 +669,56 @@ class _MyStatefulWidgetState extends State<SialMain> with AutomaticKeepAliveClie
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class LikeButton extends StatefulWidget {
+  Contents contents;
+
+  LikeButton(this.contents);
+
+  @override
+  _LikeButtonState createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<LikeButton> {
+  Contents contents;
+  bool animated = false;
+
+  @override
+  void initState() {
+    contents = widget.contents;
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topRight,
+      child: InkWell(
+        child: Padding(
+          padding: EdgeInsets.all(animated ? 1.5: 10),
+          child: animated ? Lottie.asset("images/sial/heart.json", repeat: false, width: 32, height: 32)
+              : contents.isCheck == "1" ? Image(
+            image: AssetImage('images/sial/heart_fill.png'),
+            width: 15,
+            height: 15,
+            color: redColor,
+          )
+              : Image(
+            image: AssetImage('images/sial/inspire_heart.png'),
+            width: 15,
+            height: 15,
+          ),
+        ),
+        onTap: (){like();},
+      ),
+    );
+  }
+
+  void like() async {
+    bool result = await ContentsManager().like(contents);
+    if(result) {
+      setState(() {
+        animated = contents.isCheck == "1";
+      });
+    }
+  }
 }

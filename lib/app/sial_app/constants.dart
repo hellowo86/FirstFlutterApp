@@ -17,5 +17,3 @@ const iconSize = 17.0;
 const server = "dev";
 const apiDomain = server == "prd" ? "https://timeblocks.com/" : "http://dev.gettimeblocks.com/";
 const imgDomain = server == "prd" ? "https://img.gettimeblocks.com/" : "http://imgdev.gettimeblocks.com/";
-
-const contentsOrders = ["인기순", "최신순", "거리순"];

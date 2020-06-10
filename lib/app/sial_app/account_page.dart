@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:provider/provider.dart';
 
 import 'constants.dart';
@@ -8,14 +14,7 @@ import 'login_page.dart';
 import 'manager/contents_manager.dart';
 import 'view/normal_icon.dart';
 
-class PageModel extends ChangeNotifier {
-  int topbarMode = 0;
-
-  void setTopBarMode(mode) {
-    topbarMode = mode;
-    notifyListeners();
-  }
-}
+class PageModel extends ChangeNotifier {}
 
 class AccountPage extends StatelessWidget {
   @override
@@ -44,118 +43,215 @@ class ProfileView extends StatelessWidget {
       child: Column(
         children: [
           TopBar(),
-          FutureBuilder<int>(
-            future: Future.value(0),
-            builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-              if (snapshot.hasData) {
-                return Expanded(
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(30),
+                  child: Center(
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            final ProgressDialog pr = ProgressDialog(context);
+                            pr.show();
+                            final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
+                            if (pickedFile != null) {
+                              var res = await Dio().post(apiDomain + "api/users/setName",
+                                  data: FormData.fromMap({
+                                    "name": app.name,
+                                    "lang": App.locale,
+                                    "file": await MultipartFile.fromFile(pickedFile.path, filename: pickedFile.path.split("/").last),
+                                  }),
+                                  options: Options(headers: {
+                                    "x-auth-token": App.token,
+                                  }));
+                              print(res);
+                              if (res.data["err"] == 0) {
+                                app.setProfileImg(res.data['imgT']);
+                              }
+                            }
+                            pr.hide();
+                          },
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundColor: subColor,
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundImage: (app.imgT != null && app.imgT.isNotEmpty)
+                                  ? NetworkImage(app.imgT)
+                                  : AssetImage("images/sial/default_people_img.png"),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: CircleAvatar(
+                            radius: 14,
+                            backgroundColor: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(0.0),
+                              child: Icon(
+                                Icons.photo_camera,
+                                color: iconColor,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(25),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(30),
-                        child: Center(
-                          child: Stack(
-                            alignment: Alignment.bottomRight,
-                            children: [
-                              CircleAvatar(
-                                radius: 60,
-                                backgroundColor: subColor,
-                                child: CircleAvatar(
-                                  radius: 60,
-                                  backgroundImage: (app.imgT != null && app.imgT.isNotEmpty)
-                                      ? NetworkImage(app.imgT)
-                                      : AssetImage("images/sial/default_people_img.png"),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: CircleAvatar(
-                                  radius: 14,
-                                  backgroundColor: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(0.0),
-                                    child: Icon(
-                                      Icons.photo_camera,
-                                      color: iconColor,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                      Text("가입정보", style: TextStyle(color: keyColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(width: 100, child: Text("이름", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                            Text(app.name, style: TextStyle(fontSize: 13)),
+                          ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(25),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      SizedBox(
+                        height: 50,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text("가입정보", style: TextStyle(color: keyColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            SizedBox(
-                              height: 50,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(width: 100, child: Text("이름", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                                  Text(app.name, style: TextStyle(fontSize: 13)),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 50,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(width: 100, child: Text("이메일", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                                  Text(app.email, style: TextStyle(fontSize: 13)),
-                                ],
-                              ),
-                            )
+                            Container(width: 100, child: Text("이메일", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                            Text(app.email, style: TextStyle(fontSize: 13)),
                           ],
                         ),
                       )
                     ],
                   ),
-                );
-              } else if (snapshot.hasError) {
-                return Expanded(
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(25),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 60,
+                      Text("맞춤정보 설정", style: TextStyle(color: keyColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                      SizedBox(
+                        height: 10,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text('Error: ${snapshot.error}'),
-                      )
+                      SizedBox(
+                        height: 50,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(width: 100, child: Text("성별", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                            Text(app.gender == 0 ? "알수없음" : app.gender == 1 ? "남" : "여", style: TextStyle(fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(width: 100, child: Text("생년월일", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                            Text(DateFormat().add_yMMMd().format(DateTime.fromMillisecondsSinceEpoch(app.birth)),
+                                style: TextStyle(fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(width: 100, child: Text("관심사", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                            Flexible(
+                              child: Text(
+                                app.category.map((e) => ContentsManager.categories[e]).toList().join(", "),
+                                style: TextStyle(fontSize: 13),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        child: RaisedButton(
+                          onPressed: () {
+                            _showLogoutDialog(context, app);
+                          },
+                          textColor: Colors.white,
+                          color: disableTextColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                          ),
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text('로그이웃', style: TextStyle(fontSize: 13)),
+                        ),
+                      ),
                     ],
                   ),
-                );
-              } else {
-                return Expanded(
-                  child: Center(
-                    child: SizedBox(
-                      child: CircularProgressIndicator(),
-                      width: 20,
-                      height: 20,
-                    ),
-                  ),
-                );
-              }
-            },
+                )
+              ],
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+Future<void> _showLogoutDialog(context, App app) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('로그아웃'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('로그아웃 하시겠습니까?'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text(
+              '취소',
+              style: TextStyle(color: disableTextColor),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: Text(
+              '로그아웃',
+              style: TextStyle(color: redColor),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              app.logout();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class TopBar extends StatelessWidget {

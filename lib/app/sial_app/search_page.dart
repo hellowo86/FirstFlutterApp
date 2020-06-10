@@ -192,7 +192,7 @@ class _State extends State<SearchPage> with AutomaticKeepAliveClientMixin<Search
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text(contentsOrders[order], style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(ContentsManager.contentsOrders[order], style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   Icon(Icons.arrow_drop_down),
                 ],
               ),
@@ -243,7 +243,7 @@ class _State extends State<SearchPage> with AutomaticKeepAliveClientMixin<Search
                           Navigator.of(context).pop();
                         },
                         child: Text(
-                          contentsOrders[i],
+                          ContentsManager.contentsOrders[i],
                           style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                       ),

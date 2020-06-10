@@ -2,19 +2,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firstflutter/app/sial_app/manager/contents_manager.dart';
 import 'package:firstflutter/app/sial_app/model/contents.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../constants.dart';
 import '../utils.dart';
 
 class ContentsListView extends StatelessWidget {
   var cardSize = 100.0;
+
   List<Contents> _items;
 
   ContentsListView(this._items);
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+
+  return ListView.builder(
       padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
       itemCount: _items.length,
         itemBuilder: (context, index) {
@@ -120,30 +123,21 @@ class ContentsListView extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child:InkWell(
+                      InkWell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
                           child: Image(
                             image: AssetImage('images/sial/add_to_event.png'),
                             width: 15,
                             height: 15,
                             color: iconColor,
                           ),
-                          onTap: () => {},
                         ),
+                        onTap: () => {
+
+                        },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child:  InkWell(
-                          child: Image(
-                            image: AssetImage('images/sial/heart.png'),
-                            width: 15,
-                            height: 15,
-                            color: iconColor,
-                          ),
-                          onTap: () => {},
-                        ),
-                      ),
+                      LikeButton(contents),
                     ],
                   ),
                 )
@@ -155,3 +149,55 @@ class ContentsListView extends StatelessWidget {
     });
   }
 }
+
+class LikeButton extends StatefulWidget {
+  Contents contents;
+
+  LikeButton(this.contents);
+
+  @override
+  _LikeButtonState createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<LikeButton> {
+  Contents contents;
+  bool animated = false;
+
+  @override
+  void initState() {
+    contents = widget.contents;
+  }
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: Padding(
+        padding: EdgeInsets.all(animated ? 1.5: 10),
+        child: animated ? Lottie.asset("images/sial/heart.json", repeat: false, width: 32, height: 32)
+        : contents.isCheck == "1" ? Image(
+          image: AssetImage('images/sial/heart_fill.png'),
+          width: 15,
+          height: 15,
+          color: redColor,
+        )
+        : Image(
+          image: AssetImage('images/sial/heart.png'),
+          width: 15,
+          height: 15,
+          color: iconColor,
+        ),
+      ),
+      onTap: (){like();},
+    );
+  }
+
+  void like() async {
+    bool result = await ContentsManager().like(contents);
+    if(result) {
+      setState(() {
+        animated = contents.isCheck == "1";
+      });
+    }
+  }
+}
+
+

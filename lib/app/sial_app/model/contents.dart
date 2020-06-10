@@ -266,7 +266,7 @@ class Contents {
   String getWebUrl(String authToken) {
     return apiDomain + "web/bridge/" + linkKey
         + "?level=$level"
-        + (authToken.isNotEmpty ? "&token=$authToken" : "");
+        + ((authToken != null && authToken.isNotEmpty) ? "&token=$authToken" : "");
   }
 
   String getAllkeyword() {

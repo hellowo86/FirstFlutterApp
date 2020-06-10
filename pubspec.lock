@@ -162,6 +162,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1+2"
+  firebase_dynamic_links:
+    dependency: "direct main"
+    description:
+      name: firebase_dynamic_links
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.1"
   firebase_messaging:
     dependency: "direct main"
     description:
@@ -314,16 +321,16 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.6+4"
+    version: "0.6.7+1"
   image_picker_platform_interface:
     dependency: transitive
     description:
       name: image_picker_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       url: "https://pub.dartlang.org"
@@ -455,6 +462,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
+  progress_dialog:
+    dependency: "direct main"
+    description:
+      name: progress_dialog
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.4"
   provider:
     dependency: "direct main"
     description:
@@ -483,6 +497,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.24.1"
+  share:
+    dependency: "direct main"
+    description:
+      name: share
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.4+3"
   shared_preferences:
     dependency: "direct main"
     description:

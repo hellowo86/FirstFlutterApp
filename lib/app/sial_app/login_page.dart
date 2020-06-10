@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +11,7 @@ import 'manager/contents_manager.dart';
 import 'view/normal_icon.dart';
 
 class PageModel extends ChangeNotifier {
+  bool isFindPass = false;
   bool isJoin = false;
 
   void toggle() {
@@ -22,6 +25,8 @@ class LoginPage extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+  final GlobalKey<FormState> _findPassFormKey = GlobalKey<FormState>();
+  final TextEditingController _findPassController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +39,90 @@ class LoginPage extends StatelessWidget {
             future: Future.value(0),
             builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
               PageModel model = Provider.of<PageModel>(context);
-              if (snapshot.hasData) {
+              if(model.isFindPass) {
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image(
+                          width: 80,
+                          image: AssetImage("images/sial/timeblocks_text_logo.png"),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Image(
+                          width: 150,
+                          image: AssetImage("images/sial/typo_text.png"),
+                        ),
+                        SizedBox(
+                          height: 60,
+                        ),
+                        Text(
+                          "비밀번호를 잊어버리셨나요?",
+                          style: TextStyle(fontSize: 14, color: textColor, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "기존에 가입하신 이메일을 입력하시면\n비밀번호변경 메일을 발송해드립니다.",
+                          style: TextStyle(fontSize: 12, color: textColor),
+                        ),
+                        SizedBox(
+                          height: 60,
+                        ),
+                        Expanded(
+                          child: Form(
+                            key: _findPassFormKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                    controller: _findPassController,
+                                    style: TextStyle(fontSize: 13, color: textColor),
+                                    decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(5.0),
+                                      ),
+                                      hintText: "이메일을 입력하세요",
+                                    ),
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (String value) {
+                                      if (!value.contains('@')) {
+                                        return '이메일을 입력해주세요.';
+                                      } else {
+                                        return null;
+                                      }
+                                    }),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          child: RaisedButton(
+                            onPressed: () {
+                              if (_findPassFormKey.currentState.validate()) {
+                                _findPass(context);
+                              }
+                            },
+                            textColor: Colors.white,
+                            color: keyColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                            ),
+                            padding: const EdgeInsets.all(12.0),
+                            child: Text("비밀번호변경 메일받기", style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }else {
                 return Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(30.0),
@@ -60,34 +148,36 @@ class LoginPage extends StatelessWidget {
                             key: _formKey,
                             child: Column(
                               children: [
-                                if(model.isJoin) TextFormField(
-                                    controller: _nameController,
-                                    style: TextStyle(fontSize: 13, color: textColor),
-                                    decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15.0),
+                                if (model.isJoin)
+                                  TextFormField(
+                                      controller: _nameController,
+                                      style: TextStyle(fontSize: 13, color: textColor),
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(5.0),
+                                        ),
+                                        hintText: "이름",
                                       ),
-                                      hintText: "이름",
-                                    ),
-                                    keyboardType: TextInputType.text,
-                                    validator: (String value) {
-                                      if (value.isEmpty) {
-                                        return '이름을 입력해주세요.';
-                                      } else {
-                                        return null;
-                                      }
-                                    }),
-                                if(model.isJoin) SizedBox(
-                                  height: 15,
-                                ),
+                                      keyboardType: TextInputType.text,
+                                      validator: (String value) {
+                                        if (value.isEmpty) {
+                                          return '이름을 입력해주세요.';
+                                        } else {
+                                          return null;
+                                        }
+                                      }),
+                                if (model.isJoin)
+                                  SizedBox(
+                                    height: 10,
+                                  ),
                                 TextFormField(
                                     controller: _emailController,
                                     style: TextStyle(fontSize: 13, color: textColor),
                                     decoration: InputDecoration(
                                       contentPadding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15.0),
+                                        borderRadius: BorderRadius.circular(5.0),
                                       ),
                                       hintText: "아이디 또는 이메일",
                                     ),
@@ -100,7 +190,7 @@ class LoginPage extends StatelessWidget {
                                       }
                                     }),
                                 SizedBox(
-                                  height: 15,
+                                  height: 10,
                                 ),
                                 TextFormField(
                                     controller: _passController,
@@ -108,7 +198,7 @@ class LoginPage extends StatelessWidget {
                                     decoration: InputDecoration(
                                       contentPadding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15.0),
+                                        borderRadius: BorderRadius.circular(5.0),
                                       ),
                                       hintText: "비밀번호",
                                     ),
@@ -127,12 +217,15 @@ class LoginPage extends StatelessWidget {
                                 Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        model.isFindPass = true;
+                                        model.notifyListeners();
+                                      },
                                       child: Padding(
                                         padding: const EdgeInsets.all(10.0),
                                         child: Text(
                                           "비밀번호를 잊으셨나요?",
-                                          style: TextStyle(fontSize: 12, color: blueColor),
+                                          style: TextStyle(fontSize: 12, color: keyColor),
                                         ),
                                       )),
                                 ),
@@ -144,17 +237,17 @@ class LoginPage extends StatelessWidget {
                           width: double.infinity,
                           child: RaisedButton(
                             onPressed: () {
-                              if(_formKey.currentState.validate()) {
-                                model.isJoin? _register(context) : _login(context);
+                              if (_formKey.currentState.validate()) {
+                                model.isJoin ? _register(context) : _login(context);
                               }
                             },
                             textColor: Colors.white,
                             color: keyColor,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderRadius: BorderRadius.all(Radius.circular(5)),
                             ),
                             padding: const EdgeInsets.all(12.0),
-                            child: Text(model.isJoin?"회원가입" : '로그인', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                            child: Text(model.isJoin ? "회원가입" : '로그인', style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal)),
                           ),
                         ),
                         SizedBox(
@@ -169,10 +262,10 @@ class LoginPage extends StatelessWidget {
                             textColor: Colors.white,
                             color: Color(0xff3b5998),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderRadius: BorderRadius.all(Radius.circular(5)),
                             ),
                             padding: const EdgeInsets.all(12.0),
-                            child: Text('페이스북으로 로그인', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                            child: Text('페이스북으로 로그인', style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal)),
                           ),
                         ),
                         Material(
@@ -193,32 +286,6 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                 );
-              } else if (snapshot.hasError) {
-                return Expanded(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 60,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text('Error: ${snapshot.error}'),
-                      )
-                    ],
-                  ),
-                );
-              } else {
-                return Expanded(
-                  child: Center(
-                    child: SizedBox(
-                      child: CircularProgressIndicator(),
-                      width: 20,
-                      height: 20,
-                    ),
-                  ),
-                );
               }
             },
           ),
@@ -228,13 +295,36 @@ class LoginPage extends StatelessWidget {
   }
 
   void _register(BuildContext context) async {
+    var res = await Dio().post(apiDomain + "api/users/join",
+        queryParameters: {
+          "name": _nameController.text,
+          "email": _emailController.text,
+          "passwd": _passController.text,
+          "lang": App.locale,
+          "ver": "1.0.0",
+          "aType": "E",
+          "deviceId": App.deviceId,
+          "key": "",
+        },
+        options: Options(headers: {
+          "x-auth-token": "",
+        }));
+    print(res);
 
+    if (res.data["err"] == 0) {
+      Provider.of<App>(context).join(res, _nameController.text, _emailController.text);
+    } else {
+      final snackBar = SnackBar(
+        content: Text(res.data['msg']),
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
   }
 
   void _login(BuildContext context) async {
     var res = await Dio().post(apiDomain + "api/users/login",
         queryParameters: {
-          "email" : _emailController.text,
+          "email": _emailController.text,
           "passwd": _passController.text,
           "lang": App.locale,
           "ver": "1.0.0",
@@ -244,10 +334,42 @@ class LoginPage extends StatelessWidget {
           "x-auth-token": "",
         }));
     print(res);
-    if(res.data["err"] == 0) {
-      Provider.of<App>(context).login(res);
-    }else {
-      final snackBar = SnackBar(content: Text(res.data['msg']),);
+
+    if (res.data["err"] == 0) {
+      String token = res.data['token'];
+      var profileRes = await Dio().get(apiDomain + "api/mem/profiles",
+          options: Options(headers: {
+            "x-auth-token": token,
+          }));
+      print(profileRes);
+
+      if (profileRes.data["err"] == 0) {
+        Provider.of<App>(context).login(res, profileRes);
+      }
+    } else {
+      final snackBar = SnackBar(
+        content: Text(res.data['msg']),
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  void _findPass(BuildContext context) async {
+    var res = await Dio().get(apiDomain + "password/forgetPassword?email=${_findPassController.text}&lang=${App.locale}",
+        options: Options(headers: {
+          "x-auth-token": "",
+        }));
+    print(res.data);
+    var data = json.decode(res.data);
+    if (data["err"] == 0) {
+      final snackBar = SnackBar(
+        content: Text("변경메일이 발송되었습니다."),
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    } else {
+      final snackBar = SnackBar(
+        content: Text(data['msg']),
+      );
       Scaffold.of(context).showSnackBar(snackBar);
     }
   }
@@ -263,7 +385,13 @@ class TopBar extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            NormalIcon("cancel", onTap: () {}, color: iconColor),
+            NormalIcon("cancel", onTap: () {
+              var model = Provider.of<PageModel>(context);
+              if(model.isFindPass) {
+                model.isFindPass = false;
+                model.notifyListeners();
+              }
+            }, color: iconColor, size: 15,),
             Expanded(
               child: Container(),
             ),

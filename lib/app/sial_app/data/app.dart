@@ -5,13 +5,17 @@ import 'package:devicelocale/devicelocale.dart';
 import 'package:dio/src/response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class App extends ChangeNotifier {
   static String token;
-  String name;
-  String email;
-  String imgT;
+  String name = "";
+  String email = "";
+  String imgT = "";
+  int gender = 0;
+  int birth = 0;
+  List<String> category = List();
   int currentTab = 0;
   bool isMainSearch = false;
   PageController controller;
@@ -34,6 +38,9 @@ class App extends ChangeNotifier {
     email = prefs.getString('email');
     imgT = prefs.getString('imgT');
     token = prefs.getString('token');
+    gender = prefs.getInt('gender');
+    birth = prefs.getInt('birth');
+    category = prefs.getStringList('category');
   }
 
   static setDeviceInfo(BuildContext context) async {
@@ -76,17 +83,73 @@ class App extends ChangeNotifier {
 
   bool isLogin() => token != null && token.isNotEmpty;
 
-  void login(Response<dynamic> res) async {
+  void login(Response<dynamic> res, Response<dynamic> profileRes) async {
     Map<String, dynamic> ret = res.data['ret'];
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = res.data['token'];
     name = ret['name'];
     email = ret['email'];
     imgT = ret['imgT'];
-    token = res.data['token'];
+    var profile = profileRes.data["userProfile"];
+    if(profile != null) {
+      gender = profile['gender'];
+      var date = DateTime(int.parse(profile['yyyy']),
+          int.parse(profile['mm']),
+          int.parse(profile['dd']));
+      birth = date.millisecondsSinceEpoch;
+
+      category = List();
+      List<dynamic> cate = profile["userCategory"];
+      cate.forEach((element) {
+        category.add(element["categoryId"].toString());
+      });
+    }else {
+      gender = 0;
+      birth = DateTime(2020, 10, 10).millisecondsSinceEpoch;
+      category = List();
+    }
+
     await prefs.setString('token', token);
     await prefs.setString('name', name);
     await prefs.setString('email', email);
     await prefs.setString('imgT', imgT);
+    await prefs.setInt('gender', gender);
+    await prefs.setInt('birth', birth);
+    await prefs.setStringList('category', category);
+    notifyListeners();
+  }
+
+  void join(Response<dynamic> res, n, e) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = res.data['token'];
+    name = n;
+    email = e;
+    imgT = null;
+    gender = 0;
+    birth = DateTime(2020, 10, 10).millisecondsSinceEpoch;
+    category = List();
+
+    await prefs.setString('token', token);
+    await prefs.setString('name', name);
+    await prefs.setString('email', email);
+    await prefs.setString('imgT', imgT);
+    await prefs.setInt('gender', gender);
+    await prefs.setInt('birth', birth);
+    await prefs.setStringList('category', category);
+    notifyListeners();
+  }
+
+  void setProfileImg(String imgT) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    this.imgT = imgT;
+    await prefs.setString('imgT', imgT);
+    notifyListeners();
+  }
+
+  void logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = null;
+    await prefs.setString('token', token);
     notifyListeners();
   }
 }

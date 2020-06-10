@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firstflutter/app/sial_app/constants.dart';
 import 'package:firstflutter/app/sial_app/data/app.dart';
 import 'package:firstflutter/app/sial_app/inapp_web_page.dart';
@@ -7,6 +10,7 @@ import 'package:firstflutter/app/sial_app/model/contents_group.dart';
 import 'package:firstflutter/app/sial_app/model/contents_review.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:share/share.dart';
 
 import '../contents_page.dart';
 
@@ -80,6 +84,7 @@ class ContentsManager {
 
   static final freeFilters = ["유료", "무료"];
   static final dateFilters = ["오늘", "내일", "이번주", "이번주말", "다음주"];
+  static final contentsOrders = ["인기순", "최신순", "거리순"];
 
   Future<List> getSialMain() async {
     List<ContentsGroup> result = List();
@@ -209,5 +214,57 @@ class ContentsManager {
         return InappWebPage(contents);
       }));
     }
+  }
+
+  void shareContents(BuildContext context, Contents contents) async {
+//    final DynamicLinkParameters parameters = DynamicLinkParameters(
+//      uriPrefix: 'https://abc123.app.goo.gl',
+//      link: Uri.parse('https://example.com/'),
+//      androidParameters: AndroidParameters(
+//        packageName: 'com.example.android',
+//        minimumVersion: 125,
+//      ),
+//      iosParameters: IosParameters(
+//        bundleId: 'com.example.ios',
+//        minimumVersion: '1.0.1',
+//        appStoreId: '123456789',
+//      ),
+//      googleAnalyticsParameters: GoogleAnalyticsParameters(
+//        campaign: 'example-promo',
+//        medium: 'social',
+//        source: 'orkut',
+//      ),
+//      itunesConnectAnalyticsParameters: ItunesConnectAnalyticsParameters(
+//        providerToken: '123456',
+//        campaignToken: 'example-promo',
+//      ),
+//      socialMetaTagParameters:  SocialMetaTagParameters(
+//        title: 'Example of a Dynamic Link',
+//        description: 'This link works whether app is installed or not!',
+//      ),
+//    );
+//
+//    final ShortDynamicLink dynamicUrl = await parameters.buildShortLink();
+    Share.share('친구분이 추천하신 계획입니다.\n\n${contents.title}\n\n${""}', subject: '시간을 알차게');
+  }
+
+  Future<bool> like(Contents contents) async {
+    var res = await Dio().post(apiDomain + "api/ctMain/like/${contents.id}",
+        queryParameters: {
+          "lang": App.locale,
+          "isCheck": contents.isCheck == "0" ? "1":"0"
+        },
+        options: Options(headers: makeApiHeader()));
+    if (res.data["err"] == 0) {
+      if(contents.isCheck == "0") {
+        contents.isCheck = "1";
+        contents.likeCnt = (int.parse(contents.likeCnt) + 1).toString();
+      }else {
+        contents.isCheck = "0";
+        contents.likeCnt = max(0, (int.parse(contents.likeCnt) - 1)).toString();
+      }
+      return true;
+    }
+    return false;
   }
 }

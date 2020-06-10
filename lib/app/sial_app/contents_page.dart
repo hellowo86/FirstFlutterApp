@@ -101,13 +101,63 @@ class TopBar extends StatelessWidget {
                 contents.likeCnt.toString(),
                 style: TextStyle(fontSize: 14, color: color, fontWeight: FontWeight.bold),
               ),
-              NormalIcon("heart", onTap: () {}, color: color),
+              LikeButton(contents, color),
               NormalIcon("share", onTap: () {}, color: color),
             ],
           ),
         ),
       );
     });
+  }
+}
+
+class LikeButton extends StatefulWidget {
+  Contents contents;
+  Color color;
+  LikeButton(this.contents, this.color);
+
+  @override
+  _LikeButtonState createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<LikeButton> {
+  Contents contents;
+  bool animated = false;
+
+  @override
+  void initState() {
+    contents = widget.contents;
+  }
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: Padding(
+        padding: EdgeInsets.all(animated ? 1.5: 10),
+        child: animated ? Lottie.asset("images/sial/heart.json", repeat: false, width: 34, height: 34)
+            : contents.isCheck == "1" ? Image(
+          image: AssetImage('images/sial/heart_fill.png'),
+          width: 17,
+          height: 17,
+          color: redColor,
+        )
+            : Image(
+          image: AssetImage('images/sial/heart.png'),
+          width: 17,
+          height: 17,
+          color: widget.color,
+        ),
+      ),
+      onTap: (){like();},
+    );
+  }
+
+  void like() async {
+    bool result = await ContentsManager().like(contents);
+    if(result) {
+      setState(() {
+        animated = contents.isCheck == "1";
+      });
+    }
   }
 }
 
