@@ -50,7 +50,7 @@ class App extends ChangeNotifier {
     category = prefs.getStringList('category');
     slat = prefs.getDouble('slat');
     slng = prefs.getDouble('slng');
-    allowLocationPermission = prefs.getBool('allowLocationPermission');
+    if(prefs.containsKey("allowLocationPermission")) allowLocationPermission = prefs.getBool('allowLocationPermission');
   }
 
   static setDeviceInfo(BuildContext context) async {

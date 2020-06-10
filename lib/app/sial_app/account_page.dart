@@ -199,7 +199,7 @@ class ProfileView extends StatelessWidget {
                             borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
                           padding: const EdgeInsets.all(12.0),
-                          child: Text('로그이웃', style: TextStyle(fontSize: 13)),
+                          child: Text('로그아웃', style: TextStyle(fontSize: 13)),
                         ),
                       ),
                     ],
