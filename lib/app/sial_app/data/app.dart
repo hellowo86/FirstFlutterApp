@@ -2,11 +2,15 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:devicelocale/devicelocale.dart';
+import 'package:dio/dio.dart';
 import 'package:dio/src/response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constants.dart';
 
 class App extends ChangeNotifier {
   static String token;
@@ -19,6 +23,9 @@ class App extends ChangeNotifier {
   int currentTab = 0;
   bool isMainSearch = false;
   PageController controller;
+  double slat = 0.0;
+  double slng = 0.0;
+  bool allowLocationPermission = false;
 
   static String languageCode;
   static String locale;
@@ -41,6 +48,9 @@ class App extends ChangeNotifier {
     gender = prefs.getInt('gender');
     birth = prefs.getInt('birth');
     category = prefs.getStringList('category');
+    slat = prefs.getDouble('slat');
+    slng = prefs.getDouble('slng');
+    allowLocationPermission = prefs.getBool('allowLocationPermission');
   }
 
   static setDeviceInfo(BuildContext context) async {
@@ -151,6 +161,50 @@ class App extends ChangeNotifier {
     token = null;
     await prefs.setString('token', token);
     notifyListeners();
+  }
+
+  void setCategories(Set<String> checked) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    category = checked.toList();
+    await prefs.setStringList('category', category);
+    _postProfileData();
+    notifyListeners();
+  }
+
+  _postProfileData() async {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(birth);
+    var res = await Dio().post(apiDomain + "api/mem/profiles",
+        queryParameters: {
+          "country": locale,
+          "gender": gender.toString(),
+          "yyyy": dateTime.year.toString(),
+          "mm": dateTime.month.toString(),
+          "dd": dateTime.day.toString(),
+          "addr1": "",
+          "addr2": "",
+          "addr3": "",
+          "slat": slat.toString(),
+          "slng": slng.toString(),
+          "category": category.join(":"),
+        },
+        options: Options(headers: {
+          "x-auth-token": token,
+        }));
+    print(res);
+  }
+
+  void setCurrentLocation(Position position) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    slat = position.latitude;
+    slng = position.longitude;
+    await prefs.setDouble('slat', slat);
+    await prefs.setDouble('slng', slng);
+  }
+
+  void setAllowLocationPermission(bool permission) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    allowLocationPermission = permission;
+    await prefs.setBool('allowLocationPermission', allowLocationPermission);
   }
 }
 

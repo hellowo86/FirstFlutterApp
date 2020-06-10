@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -37,13 +38,15 @@ class SialApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<App>.value(
       value: App(context, controller),
-      child: MaterialApp(
-        theme: ThemeData(
-          primaryColor: keyColor,
-          accentColor: keyColor,
-          textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme.apply(bodyColor: textColor)),
+      child: OKToast(
+        child: MaterialApp(
+          theme: ThemeData(
+            primaryColor: keyColor,
+            accentColor: keyColor,
+            textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme.apply(bodyColor: textColor)),
+          ),
+          home: Home(),
         ),
-        home: Home(),
       ),
     );
   }

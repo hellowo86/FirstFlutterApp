@@ -62,6 +62,8 @@ dependencies:
   image_picker: ^0.6.7+1
   progress_dialog: ^1.2.4
   intl: ^0.16.1
+  oktoast: ^2.3.2
+  geolocator: ^5.3.2+2
 
   # 명상 앱
   flutter_svg: ^0.17.4

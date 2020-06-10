@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 
 bool isSameDay(DateTime s, DateTime e) {
@@ -102,3 +103,7 @@ Widget makeListItemSkeleton() => Padding(
     ],
   ),
 );
+
+Future<Position> getCurrentLocation() async {
+  return await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+}
