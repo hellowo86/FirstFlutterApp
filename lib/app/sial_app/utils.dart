@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:skeleton_text/skeleton_text.dart';
+
+import 'data/app.dart';
 
 bool isSameDay(DateTime s, DateTime e) {
   return s.year == e.year && s.month == e.month && s.day == e.day;
@@ -103,6 +106,15 @@ Widget makeListItemSkeleton() => Padding(
     ],
   ),
 );
+
+Future<Position> allowLocationPermission(context) async {
+  Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  if (position != null && position.latitude != 0.0) {
+    Provider.of<App>(context).setAllowLocationPermission(true);
+    Provider.of<App>(context).setCurrentLocation(position);
+  }
+  return position;
+}
 
 Future<Position> getCurrentLocation() async {
   return await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);

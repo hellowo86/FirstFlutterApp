@@ -97,10 +97,6 @@ class TopBar extends StatelessWidget {
               Expanded(
                 child: Container(),
               ),
-              Text(
-                contents.likeCnt.toString(),
-                style: TextStyle(fontSize: 14, color: color, fontWeight: FontWeight.bold),
-              ),
               LikeButton(contents, color),
               NormalIcon("share", onTap: () {}, color: color),
             ],
@@ -130,24 +126,32 @@ class _LikeButtonState extends State<LikeButton> {
   }
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: Padding(
-        padding: EdgeInsets.all(animated ? 1.5: 10),
-        child: animated ? Lottie.asset("images/sial/heart.json", repeat: false, width: 34, height: 34)
-            : contents.isCheck == "1" ? Image(
-          image: AssetImage('images/sial/heart_fill.png'),
-          width: 17,
-          height: 17,
-          color: redColor,
-        )
-            : Image(
-          image: AssetImage('images/sial/heart.png'),
-          width: 17,
-          height: 17,
-          color: widget.color,
+    return Row(
+      children: [
+        Text(
+          contents.likeCnt.toString(),
+          style: TextStyle(fontSize: 14, color: widget.color, fontWeight: FontWeight.bold),
         ),
-      ),
-      onTap: (){like();},
+        InkWell(
+          child: Padding(
+            padding: EdgeInsets.all(animated ? 1.5: 10),
+            child: animated ? Lottie.asset("images/sial/heart.json", repeat: false, width: 34, height: 34)
+                : contents.isCheck == "1" ? Image(
+              image: AssetImage('images/sial/heart_fill.png'),
+              width: 17,
+              height: 17,
+              color: redColor,
+            )
+                : Image(
+              image: AssetImage('images/sial/heart.png'),
+              width: 17,
+              height: 17,
+              color: widget.color,
+            ),
+          ),
+          onTap: (){like();},
+        ),
+      ],
     );
   }
 

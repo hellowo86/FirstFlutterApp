@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'constants.dart';
 import 'manager/contents_manager.dart';
+import 'model/contents.dart';
 import 'utils.dart';
 import 'view/contents_listview.dart';
 import 'view/normal_icon.dart';
@@ -10,17 +11,27 @@ import 'view/normal_icon.dart';
 
 class PageModel extends ChangeNotifier {
   int topbarMode = 0;
+  List<dynamic> listData;
+  bool isLoading = false;
   Map<String, dynamic> filters = {
     "listName" : "like"
   };
 
   void setFilter(String key, dynamic value) {
     filters[key] = value;
-    notifyListeners();
+    loadData();
   }
 
   void setTopBarMode(mode) {
     topbarMode = mode;
+    notifyListeners();
+  }
+
+  void loadData() async {
+    isLoading = true;
+    notifyListeners();
+    listData = await ContentsManager().getContentsListWithFilter(filters);
+    isLoading = false;
     notifyListeners();
   }
 }
@@ -31,71 +42,73 @@ class LikeListPage extends StatefulWidget {
 }
 
 class _State extends State<LikeListPage> with AutomaticKeepAliveClientMixin<LikeListPage>{
+  PageModel _model = PageModel();
+
+  @override
+  void initState() {
+    _model.loadData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PageModel>.value(
-      value: PageModel(),
+      value: _model,
       child: Consumer<PageModel>(
         builder: (context, model, widget) {
-          Widget body = FutureBuilder<List>(
-            future: ContentsManager().getContentsListWithFilter(model.filters),
-            builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-              if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                var totalPages = snapshot.data[0];
-                var totalElements = snapshot.data[1];
-                var list = snapshot.data[2];
-                return Expanded(
-                  child: Column(
-                    children: [
-                      tab(model),
-                      Divider(
-                        height: 0.4,
-                        thickness: 0.4,
-                        color: lineColor,
-                      ),
-                      Expanded(
-                        child: list.isNotEmpty ? ContentsListView(list) : Container(child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image(width: 100, image: AssetImage('images/sial/empty_search.png'),),
-                              SizedBox(height: 10,),
-                              Text("좋아요 목록이 없습니다.", style: TextStyle(color: disableTextColor),)
-                            ],
-                          ),
-                        ),),
-                      ),
-                    ],
+          Widget body;
+
+          if (!model.isLoading && model.listData != null && model.listData.isNotEmpty) {
+            var totalPages = model.listData[0];
+            var totalElements = model.listData[1];
+            List<Contents> list = model.listData[2];
+            body = Expanded(
+              child: Column(
+                children: [
+                  tab(model),
+                  Divider(
+                    height: 0.4,
+                    thickness: 0.4,
+                    color: lineColor,
                   ),
-                );
-              } else if (snapshot.hasError) {
-                return Expanded(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 60,
+                  Expanded(
+                    child: list.isNotEmpty
+                        ? ContentsListView(list, totalPages, model.filters)
+                        : Container(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image(
+                              width: 100,
+                              image: AssetImage('images/sial/empty_search.png'),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "검색결과가 없습니다.",
+                              style: TextStyle(color: disableTextColor),
+                            )
+                          ],
+                        ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text('Error: ${snapshot.error}'),
-                      )
-                    ],
+                    ),
                   ),
-                );
-              } else {
-                return Expanded(
-                    child: Column(
-                      children: [
-                        tab(model),
-                        makeListSkeleton(),
-                      ],
-                    ));
-              }
-            },
-          );
+                ],
+              ),
+            );
+          } else {
+            body = Expanded(
+                child: Column(
+                  children: [
+                    tab(model),
+                    makeListSkeleton(),
+                  ],
+                ));
+          }
+
           return Column(
             children: [
               TopBar(),
@@ -143,7 +156,7 @@ class TopBar extends StatelessWidget {
     return Consumer<PageModel>(
       builder: (context ,model, child) {
         return Container(
-          height: 70,
+          height: topbarSize,
           child: Padding(
             padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
             child: Row(

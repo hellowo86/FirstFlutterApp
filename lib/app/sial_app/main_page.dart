@@ -95,7 +95,7 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70,
+      height: topbarSize,
       child: Padding(
         padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
         child: Row(
@@ -129,7 +129,7 @@ class BottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     App app = Provider.of<App>(context);
     return Container(
-      height: 70,
+      height: 53,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [

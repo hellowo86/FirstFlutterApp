@@ -379,7 +379,7 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70,
+      height: topbarSize,
       child: Padding(
         padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
         child: Row(

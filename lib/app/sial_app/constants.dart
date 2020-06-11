@@ -13,6 +13,7 @@ const lineColor = Color(0xffDFE3E6);
 const almostWhiteColor = Color(0xfff4f4f4);
 
 const iconSize = 17.0;
+const topbarSize = 55.0;
 
 const server = "dev";
 const apiDomain = server == "prd" ? "https://timeblocks.com/" : "http://dev.gettimeblocks.com/";

@@ -241,7 +241,7 @@ class TopBar extends StatelessWidget {
               )
             : BoxDecoration(color: Colors.transparent),
         child: Container(
-          height: 60,
+          height: topbarSize,
           child: Stack(
             children: <Widget>[
               Padding(

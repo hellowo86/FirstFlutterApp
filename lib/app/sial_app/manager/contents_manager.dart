@@ -8,6 +8,7 @@ import 'package:firstflutter/app/sial_app/inapp_web_page.dart';
 import 'package:firstflutter/app/sial_app/model/contents.dart';
 import 'package:firstflutter/app/sial_app/model/contents_group.dart';
 import 'package:firstflutter/app/sial_app/model/contents_review.dart';
+import 'package:firstflutter/app/sial_app/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:share/share.dart';
@@ -85,6 +86,7 @@ class ContentsManager {
   static final freeFilters = ["유료", "무료"];
   static final dateFilters = ["오늘", "내일", "이번주", "이번주말", "다음주"];
   static final contentsOrders = ["인기순", "최신순", "거리순"];
+  static final distanceFilters = [[0, "10km", 10], [1, "20km", 20], [2, "50km", 50], [3, "100km", 100], [4, "제한없음", 0]];
 
   Future<List> getSialMain() async {
     List<ContentsGroup> result = List();
@@ -119,21 +121,32 @@ class ContentsManager {
     url += "?type=$type";
 
     if (filters.containsKey("listName")) url += "&listName=${filters["listName"]}";
-    if (filters.containsKey("order")) url += "&order=${filters["order"]}";
+    if (filters.containsKey("order")) {
+      var order = filters["order"];
+      url += "&order=$order";
+      if(order == 2) {
+        var position = await getCurrentLocation();
+        if(position != null && position.latitude != 0.0) {
+          url += "&slat=${position.latitude}";
+          url += "&slng=${position.longitude}";
+        }
+      }
+    }
 
     if (type == 2) {
       if (filters.containsKey("far")) {
         var far = filters["far"];
         url += "&far=$far";
-        if (far > 0) {
-          url += "&slat=${filters["slat"]}";
-          url += "&slng=${filters["slng"]}";
+        var position = await getCurrentLocation();
+        if (far > 0 && position != null && position.latitude != 0.0) {
+          url += "&slat=${position.latitude}";
+          url += "&slng=${position.longitude}";
         }
       }
 
       if (filters.containsKey("day")) {
         var day = filters["day"];
-        url += "&day=${filters["day"]}";
+        url += "&day=$day";
         if (day == 9) {
           url += "&startDay=${filters["startDay"]}";
           url += "&endDay=${filters["endDay"]}";
