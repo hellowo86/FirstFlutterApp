@@ -38,7 +38,9 @@ class Home extends StatelessWidget {
               children: [
                 OutlineButton(
                   child: Text("hjjh"),
-                  onPressed: () async {},
+                  onPressed: () async {
+                    Navigator.pop(context);
+                  },
                 ),
                 MyStatefulWidget(),
               ],

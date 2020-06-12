@@ -156,7 +156,7 @@ class _LikeButtonState extends State<LikeButton> {
   }
 
   void like() async {
-    bool result = await ContentsManager().like(contents);
+    bool result = await ContentsManager().like(context, contents);
     if(result) {
       setState(() {
         animated = contents.isCheck == "1";

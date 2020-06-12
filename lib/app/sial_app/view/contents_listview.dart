@@ -7,13 +7,13 @@ import 'package:lottie/lottie.dart';
 import '../constants.dart';
 import '../utils.dart';
 
-
 class ContentsListView extends StatefulWidget {
   List<Contents> _items;
   int totalPages;
   Map<String, dynamic> filters;
+  var scrollMode = 0;
 
-  ContentsListView(this._items, this.totalPages, this.filters);
+  ContentsListView(this._items, this.totalPages, this.filters, {this.scrollMode = 0});
 
   @override
   _ContentsListViewState createState() => _ContentsListViewState();
@@ -49,23 +49,28 @@ class _ContentsListViewState extends State<ContentsListView> {
       onNotification: (ScrollNotification scrollInfo) {
         if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
           int nextPage = (widget.filters.containsKey("page") ? widget.filters["page"] : 0) + 1;
-          if(nextPage < widget.totalPages && !isLoading) {
+          if (nextPage < widget.totalPages && !isLoading) {
             _loadMore(nextPage);
           }
         }
         return true;
       },
       child: ListView.builder(
-          padding: const EdgeInsets.fromLTRB(0, 15, 0, 50),
+          physics: widget.scrollMode == 1 ? NeverScrollableScrollPhysics() : BouncingScrollPhysics(),
+          shrinkWrap: widget.scrollMode == 1 ? true : false,
+          padding: const EdgeInsets.fromLTRB(0, 15, 0, 30),
           itemCount: _items.length + (isLoading ? 1 : 0),
           itemBuilder: (context, index) {
-            if(index == _items.length) {
+            if (index == _items.length) {
               return Container(
                 height: 40,
                 child: Center(
                   child: SizedBox(
-                    width: 30, height: 30,
-                      child: CircularProgressIndicator(strokeWidth: 2,)),
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      )),
                 ),
               );
             }
@@ -101,11 +106,14 @@ class _ContentsListViewState extends State<ContentsListView> {
                                 width: cardSize,
                                 height: cardSize,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(8)), border: Border.all(color: Color(0x30000000), width: 0.5)),
+                                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                                    border: Border.all(color: Color(0x30000000), width: 0.5)),
                               ),
                             ],
                           ),
-                          SizedBox(width: 15,),
+                          SizedBox(
+                            width: 15,
+                          ),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +149,9 @@ class _ContentsListViewState extends State<ContentsListView> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: 10,),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
                                     if (contents.isEvent())
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(0, 3, 0, 0),
@@ -181,9 +191,7 @@ class _ContentsListViewState extends State<ContentsListView> {
                                   color: disableTextColor,
                                 ),
                               ),
-                              onTap: () => {
-
-                              },
+                              onTap: () => {},
                             ),
                             LikeButton(contents),
                           ],
@@ -216,37 +224,40 @@ class _LikeButtonState extends State<LikeButton> {
   void initState() {
     contents = widget.contents;
   }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       child: Padding(
-        padding: EdgeInsets.all(animated ? 1.5: 10),
-        child: animated ? Lottie.asset("images/sial/heart.json", repeat: false, width: 32, height: 32)
-        : contents.isCheck == "1" ? Image(
-          image: AssetImage('images/sial/heart_fill.png'),
-          width: 15,
-          height: 15,
-          color: redColor,
-        )
-        : Image(
-          image: AssetImage('images/sial/heart.png'),
-          width: 15,
-          height: 15,
-          color: disableTextColor,
-        ),
+        padding: EdgeInsets.all(animated ? 1.5 : 10),
+        child: animated
+            ? Lottie.asset("images/sial/heart.json", repeat: false, width: 32, height: 32)
+            : contents.isCheck == "1"
+                ? Image(
+                    image: AssetImage('images/sial/heart_fill.png'),
+                    width: 15,
+                    height: 15,
+                    color: redColor,
+                  )
+                : Image(
+                    image: AssetImage('images/sial/heart.png'),
+                    width: 15,
+                    height: 15,
+                    color: disableTextColor,
+                  ),
       ),
-      onTap: (){like();},
+      onTap: () {
+        like();
+      },
     );
   }
 
   void like() async {
-    bool result = await ContentsManager().like(contents);
-    if(result) {
+    bool result = await ContentsManager().like(context, contents);
+    if (result) {
       setState(() {
         animated = contents.isCheck == "1";
       });
     }
   }
 }
-
-

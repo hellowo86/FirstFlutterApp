@@ -65,6 +65,8 @@ dependencies:
   oktoast: ^2.3.2
   geolocator: ^5.3.2+2
   date_range_picker: ^1.0.6
+  apple_sign_in: ^0.1.0
+  flutter_facebook_login: ^3.0.0
 
   # 명상 앱
   flutter_svg: ^0.17.4

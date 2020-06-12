@@ -5,15 +5,21 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firstflutter/app/sial_app/constants.dart';
 import 'package:firstflutter/app/sial_app/data/app.dart';
 import 'package:firstflutter/app/sial_app/inapp_web_page.dart';
+import 'package:firstflutter/app/sial_app/view/login_view.dart';
 import 'package:firstflutter/app/sial_app/model/contents.dart';
 import 'package:firstflutter/app/sial_app/model/contents_group.dart';
 import 'package:firstflutter/app/sial_app/model/contents_review.dart';
 import 'package:firstflutter/app/sial_app/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../contents_page.dart';
+import '../contents_theme_page.dart';
 
 class ContentsManager {
   static final ContentsManager _instance = ContentsManager._internal();
@@ -261,23 +267,102 @@ class ContentsManager {
     Share.share('친구분이 추천하신 계획입니다.\n\n${contents.title}\n\n${""}', subject: '시간을 알차게');
   }
 
-  Future<bool> like(Contents contents) async {
-    var res = await Dio().post(apiDomain + "api/ctMain/like/${contents.id}",
-        queryParameters: {
-          "lang": App.locale,
-          "isCheck": contents.isCheck == "0" ? "1":"0"
-        },
-        options: Options(headers: makeApiHeader()));
-    if (res.data["err"] == 0) {
-      if(contents.isCheck == "0") {
-        contents.isCheck = "1";
-        contents.likeCnt = (int.parse(contents.likeCnt) + 1).toString();
-      }else {
-        contents.isCheck = "0";
-        contents.likeCnt = max(0, (int.parse(contents.likeCnt) - 1)).toString();
+  Future<bool> like(BuildContext context, Contents contents) async {
+    if(App.isLogin()){
+      var res = await Dio().post(apiDomain + "api/ctMain/like/${contents.id}",
+          queryParameters: {
+            "lang": App.locale,
+            "isCheck": contents.isCheck == "0" ? "1":"0"
+          },
+          options: Options(headers: makeApiHeader()));
+      if (res.data["err"] == 0) {
+        if(contents.isCheck == "0") {
+          contents.isCheck = "1";
+          contents.likeCnt = (int.parse(contents.likeCnt) + 1).toString();
+        }else {
+          contents.isCheck = "0";
+          contents.likeCnt = max(0, (int.parse(contents.likeCnt) - 1)).toString();
+        }
+        return true;
       }
-      return true;
+    }else {
+      showLoginDialog(context, Provider.of<App>(context), "좋아요");
     }
     return false;
+  }
+
+  void getThemeContentsByLocation(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.containsKey("token") ? prefs.getString("token") : "";
+    bool allowLocationPermission = prefs.containsKey("allowLocationPermission") ? prefs.getBool("allowLocationPermission") : false;
+
+    if(allowLocationPermission) {
+      Position pos = await getCurrentLocation();
+
+      Future.delayed(Duration(seconds: 1), () async {
+        var res = await Dio().post(apiDomain + "api/ctMain/push/location",
+            queryParameters: {
+              "lat": "37.497617",
+              "lon": "127.025497",
+            },
+            options: Options(headers: {
+              "x-auth-token": token,
+            }));
+        print(res.data.toString());
+
+        if(res.data["err"] == 0) {
+          var pushMsg = res.data["ret"]["pushMsg"];
+          var placeName = res.data["ret"]["placeName"];
+          var isInLocation = res.data["ret"]["isInLocation"];
+
+          Widget widget = Container(
+            margin: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+            padding: const EdgeInsets.fromLTRB(25, 0, 50, 0),
+            height: 70,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: 8,
+                  blurRadius: 10,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: GestureDetector(
+              onTap: (){ Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {
+                return ContentsThemePage("1", placeName, null);
+              })); },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image(width:25, height:25, image: AssetImage("images/sial/star_twinkle.png"),),
+                  SizedBox(
+                    width: 25,
+                  ),
+                  Expanded(
+                    child: Text(pushMsg, style: TextStyle(fontSize: 14, color: textColor, fontWeight: FontWeight.bold)),
+                  )
+                ],
+              ),
+            ),
+          );
+
+          showToastWidget(
+            widget,
+            position: ToastPosition.top,
+            duration: Duration(seconds: 4),
+            handleTouch: true,
+            onDismiss: () {
+              print("the toast dismiss"); // the method will be called on toast dismiss.
+            },
+          );
+        }
+      });
+    }
   }
 }

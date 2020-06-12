@@ -91,7 +91,7 @@ class App extends ChangeNotifier {
     }
   }
 
-  bool isLogin() => token != null && token.isNotEmpty;
+  static bool isLogin() => token != null && token.isNotEmpty;
 
   void login(Response<dynamic> res, Response<dynamic> profileRes) async {
     Map<String, dynamic> ret = res.data['ret'];

@@ -36,6 +36,7 @@ class SialApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ContentsManager().getThemeContentsByLocation(context);
     return ChangeNotifierProvider<App>.value(
       value: App(context, controller),
       child: OKToast(
@@ -109,9 +110,13 @@ class TopBar extends StatelessWidget {
               child: Container(),
             ),
             NormalIcon("setting", onTap: () {
-              Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {
-                return ProfilingPage();
-              }));
+              if(App.isLogin()) {
+                Navigator.push(context, MaterialPageRoute<void>(builder: (BuildContext context) {
+                  return ProfilingPage();
+                }));
+              }else {
+               showLoginDialog(context, Provider.of<App>(context), "맞춤설정");
+              }
             }),
             NormalIcon("search", onTap: () {
               Provider.of<App>(context).startMainSearch();
@@ -717,7 +722,7 @@ class _LikeButtonState extends State<LikeButton> {
   }
 
   void like() async {
-    bool result = await ContentsManager().like(contents);
+    bool result = await ContentsManager().like(context, contents);
     if(result) {
       setState(() {
         animated = contents.isCheck == "1";

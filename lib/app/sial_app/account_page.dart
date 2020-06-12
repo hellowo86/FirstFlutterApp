@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,8 @@ import 'package:provider/provider.dart';
 
 import 'constants.dart';
 import 'data/app.dart';
-import 'login_page.dart';
+import 'utils.dart';
+import 'view/login_view.dart';
 import 'manager/contents_manager.dart';
 import 'view/normal_icon.dart';
 
@@ -21,8 +23,8 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<App>(
       builder: (context, app, widget) {
-        if (!app.isLogin()) {
-          return LoginPage();
+        if (!App.isLogin()) {
+          return LoginView();
         } else {
           return ProfileView(app);
         }
@@ -191,7 +193,7 @@ class ProfileView extends StatelessWidget {
                         width: double.infinity,
                         child: RaisedButton(
                           onPressed: () {
-                            _showLogoutDialog(context, app);
+                            showAlertDialog(context, app, "로그아웃", sub:"로그아웃 하시겠습니까?", actionTitle: "로그아웃", action: (){app.logout();});
                           },
                           textColor: Colors.white,
                           color: disableTextColor,
@@ -212,46 +214,6 @@ class ProfileView extends StatelessWidget {
       ),
     );
   }
-}
-
-Future<void> _showLogoutDialog(context, App app) async {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false, // user must tap button!
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('로그아웃'),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              Text('로그아웃 하시겠습니까?'),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: Text(
-              '취소',
-              style: TextStyle(color: disableTextColor),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          FlatButton(
-            child: Text(
-              '로그아웃',
-              style: TextStyle(color: redColor),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-              app.logout();
-            },
-          ),
-        ],
-      );
-    },
-  );
 }
 
 class TopBar extends StatelessWidget {
